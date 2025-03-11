@@ -36,3 +36,14 @@ En esta primera sesión conoceremos la estructura, objetivos y expectativas del 
 - Introducción práctica a Git y GitHub con ejercicio colaborativo.
 
 ---
+
+## 📌 **Clase 2 – Martes, 11 de marzo de 2025**
+**Python, Ambientes Virtuales y Docker**
+
+En esta clase abordaremos `Python` como lenguaje fundamental para analítica de datos, con énfasis en la creación y gestión de ambientes virtuales. Exploraremos cómo Docker facilita la creación de entornos reproducibles y aprenderemos prácticas generales y recomendadas para desarrollar servicios analíticos.
+
+- Introducción básica a Docker.
+- Ambientes virtuales (`venv`, `conda`).
+- Construccion de imagen Docker con kernel `Python` para usar con [`JupyterLab`](https://jupyterlab.readthedocs.io/en/stable/getting_started/overview.html) y [`Vscode-server`](https://code.visualstudio.com/docs/remote/vscode-server)
+
+---
