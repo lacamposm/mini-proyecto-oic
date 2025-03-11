@@ -26,6 +26,17 @@ Para participar efectivamente en el curso, es necesario instalar las siguientes 
 - **[`FastAPI`](https://fastapi.tiangolo.com/):** Desarrollo rápido y eficiente de APIs.
 ---
 
+## 📌 **Clase 1 – Viernes, 7 de marzo de 2025**
+**Introducción y Herramientas Colaborativas (Git y GitHub)**
+
+En esta primera sesión conoceremos la estructura, objetivos y expectativas del curso. Exploraremos las herramientas clave que facilitarán nuestro trabajo durante todo el curso, enfocándonos especialmente en Git y GitHub. Realizaremos un ejercicio práctico para experimentar de primera mano la importancia del control de versiones y la colaboración efectiva en equipo.
+
+- Presentación general del curso (objetivos y expectativas).
+- Presentacion del calendario y contenidos del curso.
+- Introducción práctica a Git y GitHub con ejercicio colaborativo.
+
+---
+
 ## 📌 **Clase 2 – Martes, 11 de marzo de 2025**
 **Python, Ambientes Virtuales y Docker**
 
