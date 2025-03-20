@@ -1,9 +1,9 @@
-# oic_model_houses/services/user_service.py
+# oic_model_server/services/user_service.py
 from sqlmodel import Session, select
 
 from fastapi import HTTPException
 
-from oic_model_houses.models.user import UserTable, UserCreate
+from oic_model_server.models.user import UserTable, UserCreate
 
 
 class UserService:

@@ -1,7 +1,7 @@
-# oic_model_houses/core/database.py
+# oic_model_server/core/database.py
 from sqlmodel import Session, create_engine
 
-from oic_model_houses.core.config import settings
+from oic_model_server.core.config import settings
 
 from sqlalchemy.orm import sessionmaker
 

@@ -1,4 +1,4 @@
-# oic_model_houses/main.py
+# oic_model_server/main.py
 import asyncio
 
 from fastapi import FastAPI
@@ -7,11 +7,11 @@ from contextlib import asynccontextmanager
 
 from sqlmodel import SQLModel
 
-from oic_model_houses.models import *
+from oic_model_server.models import *
 
-from oic_model_houses.api.routes import user as user_router
+from oic_model_server.api.routes import user as user_router
 
-from oic_model_houses.core.database import engine
+from oic_model_server.core.database import engine
 
 
 @asynccontextmanager

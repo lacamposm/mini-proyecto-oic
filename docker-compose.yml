@@ -33,17 +33,23 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - .:/mini-proyecto-oic
+      - ./oic_model_server:/mini-proyecto-oic/oic_model_server
     networks:
       - app_network
     command: >
-      sh -c "conda run --live-stream -n model-oic uvicorn oic_model_houses.main:app --host 0.0.0.0 --port 8000 --reload"
+      sh -c "conda run --live-stream -n oic-model-server uvicorn oic_model_server.main:app --host 0.0.0.0 --port 8000 --reload"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   oic-model-streamlit:
     build: .
     container_name: oic-model-streamlit
     depends_on:
-      - oic-model-api
+      oic-model-api:
+        condition: service_healthy
     env_file:
       - .env
     environment:
@@ -51,11 +57,11 @@ services:
     ports:
       - "8501:8501"
     volumes:
-      - .:/mini-proyecto-oic
+      - ./streamlit_app.py:/mini-proyecto-oic/streamlit_app.py
     networks:
       - app_network
     command: >
-      sh -c "conda run --live-stream -n model-oic streamlit run streamlit_app.py --server.port 8501"
+      sh -c "conda run --live-stream -n oic-model-server streamlit run streamlit_app.py --server.port 8501"
   
 volumes:
   oic-db-model-service:

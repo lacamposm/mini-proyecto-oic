@@ -1,4 +1,4 @@
-# oic_model_houses/models/prediction.py
+# oic_model_server/models/prediction.py
 from typing import Optional
 
 from sqlmodel import SQLModel, Field

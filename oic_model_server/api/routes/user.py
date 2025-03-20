@@ -1,13 +1,13 @@
-# oic_model_houses/api/routes/user.py
+# oic_model_server/api/routes/user.py
 from sqlmodel import Session
 
 from fastapi import APIRouter, Depends
 
-from oic_model_houses.core.database import get_db
+from oic_model_server.core.database import get_db
 
-from oic_model_houses.models.user import UserCreate, UserRead
+from oic_model_server.models.user import UserCreate, UserRead
 
-from oic_model_houses.services.user_service import UserService
+from oic_model_server.services.user_service import UserService
 
 
 router = APIRouter()

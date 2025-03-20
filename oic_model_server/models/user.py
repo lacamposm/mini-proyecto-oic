@@ -1,4 +1,4 @@
-# oic_model_houses/models/user.py
+# oic_model_server/models/user.py
 import uuid
 
 from datetime import datetime

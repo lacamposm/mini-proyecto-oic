@@ -1,4 +1,4 @@
-# Mini Proyecto OIC
+# Servicio OIC-MODEL
 
 Este repositorio contiene un modelo analítico basado en regresión lineal, integrado con FastAPI, PostgreSQL y una 
 interfaz gráfica desarrollada en Streamlit, todo encapsulado y dockerizado para facilitar el despliegue.
@@ -7,36 +7,38 @@ interfaz gráfica desarrollada en Streamlit, todo encapsulado y dockerizado para
 
 ## Estructura del Proyecto
 
-
 ```plaintext
 mini-proyecto-oic/
 ├── data/
 │   └── house_prices.csv
-├── models/
-│   └── modelo_regresion.pkl
-├── src/
-│   └── oic_model_houses/
-│       ├── api/
-│       │   ├── __init__.py
-│       │   └── routes/
-│       │       └── __init__.py
-│       ├── core/
-│       │   ├── __init__.py
-│       │   ├── config.py
-│       │   ├── database.py
-│       ├── models/
-│       │   ├── __init__.py
-│       │   └── prediction.py
-│       ├── services/
-│       │   ├── __init__.py
-│       │   └── prediction_service.py
-│       ├── __init__.py
-│       ├── main.py
-│       ├── regression_model.py
-│       └── streamlit_app.py
+├── model/
+│   ├── __init__.py
+│   ├── modelo_regresion.pkl
+│   └── regression_model.py
+├── oic_model_server/
+│   ├── api/
+│   │   ├── __init__.py
+│   │   └── routes/
+│   │       ├── __init__.py
+│   │       └── user.py
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── config.py
+│   │   ├── database.py
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── predict.py
+│   │   └── user.py
+│   ├── services/
+│   │   ├── __init__.py
+│   │   ├── predict_service.py
+│   │   └── user_service.py
+│   ├── __init__.py
+│   └── main.py
 ├── Dockerfile
 ├── docker-compose.yml
 ├── environment.yml
+├── streamlit_app.py
 └── README.md
 ```
 
@@ -51,48 +53,79 @@ cd mini-proyecto-oic
 
 ## Paso 2: Uso del Dockerfile
 
-Vamos a construir y probar la imagen Docker de forma independiente.
+El proyecto ofrece varias formas de trabajar con Docker según tus necesidades:
 
 ### 1. Construcción de la Imagen
 
 Ejecuta el siguiente comando para construir la imagen desde el `Dockerfile`:
 
 ```sh
-docker build -t mini-proyecto-oic .
+docker build -t oic-model-service .
 ```
 
-Si la construcción fue exitosa, verás una salida similar a esta:
+Si la construcción fue exitosa, verás la imagen creada en tu lista de imágenes Docker:
+
 ```sh
-REPOSITORY TAG IMAGE ID CREATED SIZE mini-proyecto-oic latest abc123456789 X minutes ago 1.2GB
+docker images
 ```
 
----
+### 2. Opciones para Ejecutar los Contenedores
 
-### 2. Creación de un Contenedor
+#### Opción A: Shell Interactivo
 
-Para probar la imagen antes de usar `docker-compose`, ejecuta un contenedor de manera manual:
+Para acceder a un shell interactivo dentro del contenedor:
 
 ```sh
-docker run --rm -it mini-proyecto-oic bash
+docker run -it --rm oic-model-service /bin/bash
 ```
 
-Este comando iniciará un shell interactivo dentro del contenedor. Dentro de este, puedes verificar que el entorno de 
-Conda esté activo y que las dependencias estén correctamente instaladas ejecutando:
+Este comando te permite explorar el contenedor y verificar la instalación de dependencias:
 
 ```sh
-bash
 conda list
 ```
 
-Si todo está correcto, deberías ver la lista de paquetes instalados.
+#### Opción B: Desarrollo con Volúmenes Montados
 
-Para salir del contenedor, usa:
+Para desarrollar mientras los cambios se reflejan en tiempo real:
+
+```sh
+docker run -it --rm -v "$(pwd)":/$(basename "$(pwd)") -w /$(basename "$(pwd)") oic-model-service /bin/bash
+```
+
+Este comando:
+- Monta el directorio actual como un volumen en el contenedor
+- Establece el directorio de trabajo al nombre de la carpeta actual
+- Abre un shell interactivo
+
+#### Opción C: Servicios con Puertos Expuestos
+
+Para ejecutar servicios como Jupyter o la API con puertos accesibles:
+
+```sh
+docker run -it --rm -p 8888:8888 -p 8080:8080 -v "$(pwd)":/$(basename "$(pwd)") -w /$(basename "$(pwd)") oic-model-service
+```
+
+Este comando:
+- Expone los puertos 8888 (Jupyter) y 8080 (API)
+- Monta el directorio actual como volumen
+- Permite acceder a los servicios desde el navegador local
+
+Una vez que el contenedor esté en ejecución, podrás acceder a los servicios en:
+
+- **Jupyter Notebook:** [http://localhost:8888](http://localhost:8888)
+  - Si se requiere un token de acceso, revisa los logs del contenedor para encontrarlo.
+
+- **VS Code-Server:** [http://localhost:8080/?folder=/mini-proyecto-oic](http://localhost:8080/?folder=/mini-proyecto-oic)
+
+
+Para salir de cualquier contenedor interactivo, usa:
 
 ```sh
 exit
 ```
 
-## Paso 3: Construcción y Ejecución de Servicios con Docker Compose
+## Paso 3: Construcción y Ejecución de Servicios con docker-compose
 
 Después de haber construido y probado la imagen Docker, podemos proceder a levantar los servicios completos utilizando `docker-compose`.
 
@@ -104,7 +137,31 @@ Asegúrate de que el archivo `docker-compose.yml` esté correctamente configurad
 
 ### 2. Construcción y Levantamiento de Servicios
 
-Ejecuta los siguientes comandos para construir y ejecutar los servicios en segundo plano:
+Existen varias formas de levantar los servicios con docker-compose:
+
+#### Opción A: Levantar servicios con un nombre de proyecto personalizado
+
+```sh
+docker-compose -p oic-api-service up
+```
+
+Este comando:
+- Asigna el nombre "oic-api-service" al proyecto
+- Levanta todos los contenedores definidos en `docker-compose.yml`
+- Muestra los logs en la terminal (modo interactivo)
+
+#### Opción B: Construir y levantar servicios en un solo paso
+
+```sh
+docker-compose -p oic-api-service up --build
+```
+
+Este comando:
+- Fuerza la reconstrucción de las imágenes
+- Levanta los servicios después de la construcción
+- Útil cuando hay cambios en el código que requieren una nueva construcción
+
+#### Opción C: Ejecutar en segundo plano
 
 ```sh
 docker-compose build
@@ -112,10 +169,9 @@ docker-compose up -d
 ```
 
 Este proceso:
-
-- **Construirá la imagen** si no existe.
-- **Levantará los contenedores** definidos en `docker-compose.yml`.
-- **Iniciará la API con FastAPI**, la interfaz gráfica con Streamlit y la base de datos PostgreSQL.
+- **Construirá la imagen** si no existe
+- **Levantará los contenedores** definidos en `docker-compose.yml` en modo detached (segundo plano)
+- **Iniciará la API con FastAPI**, la interfaz gráfica con Streamlit y la base de datos PostgreSQL
 
 Para verificar que los contenedores están corriendo, usa el siguiente comando:
 
@@ -167,7 +223,7 @@ Una vez iniciados los servicios, verifica que estén accesibles:
   La base de datos corre en `localhost:5432`. Puedes conectarte usando un cliente como `pgAdmin` o `psql`:
 
   ```sh
-  psql -h localhost -U user -d dbname
+  psql -U postgres
   ```
 
     Para verificar que la base de datos está funcionando correctamente, puedes listar las tablas disponibles 
@@ -187,7 +243,7 @@ Una vez iniciados los servicios, verifica que estén accesibles:
     `PostgreSQL` dentro del contenedor:
     
     ```shell
-    docker exec -it mini-proyecto-oic-db-1 psql -U user -d dbname
+        docker exec -it oic-api-service_db_1 psql -U postgres -d postgres
     ```
 
 ### 4. Administración de Contenedores
@@ -195,7 +251,19 @@ Una vez iniciados los servicios, verifica que estén accesibles:
 Si necesitas ver los logs de los servicios en tiempo real, ejecuta:
 
 ```sh
-docker compose logs -f
+docker-compose logs -f
+```
+
+Para detener los servicios:
+
+```sh
+docker-compose down
+```
+
+Para detener los servicios y eliminar volúmenes:
+
+```sh
+docker-compose down -v
 ```
 
 ## Contribuciones
