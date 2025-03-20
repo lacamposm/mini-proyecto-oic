@@ -1,104 +1,215 @@
-# 📆 **Curso de inducción para el desarrollo analítico del OIC**
+# Mini Proyecto OIC
 
-- **Docente:** [Luis Andrés Campos Maldonado](https://co.linkedin.com/in/lacamposm)
-- **Correo:** [luisandres.campos@igac.gov.co](mailto:luisandres.campos@igac.gov.co)
-- **Github:** [https://github.com/lacamposm]()
-
----
-
-## 🛠️ Herramientas a instalar en el curso.
-
-Para participar efectivamente en el curso, es necesario instalar las siguientes herramientas esenciales:
-
-| Herramienta | ¿Desde qué clase se requiere? | Comentarios                                               |
-|-------------|-------------------------------|-----------------------------------------------------------|
-| **Git**     | ✅ Clase 1                    | Fundamental para control de versiones y trabajo colaborativo. |
-| **Docker**  | ✅ Clase 2                    | Recomendado Docker Desktop, especialmente en Windows y MacOS. |
+Este repositorio contiene un modelo analítico basado en regresión lineal, integrado con FastAPI, PostgreSQL y una 
+interfaz gráfica desarrollada en Streamlit, todo encapsulado y dockerizado para facilitar el despliegue.
 
 ---
 
-## 🛠️ **Herramientas principales del curso:**
+## Estructura del Proyecto
 
-- **[`Python`](https://www.python.org/):** Lenguaje principal para desarrollo analítico.
-- **[`Git`](https://git-scm.com/book/ms/v2/Getting-Started-About-Version-Control) y [`GitHub`](https://github.com/)/[`GitLab:`](https://about.gitlab.com/)** Control de versiones y colaboración.
-- **[`Docker`](https://www.docker.com/):** Contenedores y despliegue reproducible.
-- **[`Docker-compose:`](https://docs.docker.com/compose/)** Orquestación y despliegue de servicios.
-- **[`FastAPI`](https://fastapi.tiangolo.com/):** Desarrollo rápido y eficiente de APIs.
----
 
-## 📌 **Clase 1 – Viernes, 7 de marzo de 2025**
-**Introducción y Herramientas Colaborativas (Git y GitHub)**
-
-En esta primera sesión conoceremos la estructura, objetivos y expectativas del curso. Exploraremos las herramientas clave que facilitarán nuestro trabajo durante todo el curso, enfocándonos especialmente en Git y GitHub. Realizaremos un ejercicio práctico para experimentar de primera mano la importancia del control de versiones y la colaboración efectiva en equipo.
-
-- Presentación general del curso (objetivos y expectativas).
-- Presentacion del calendario y contenidos del curso.
-- Introducción práctica a Git y GitHub con ejercicio colaborativo.
-
----
-
-## 📌 **Clase 2 – Martes, 11 de marzo de 2025**
-**Python, Ambientes Virtuales y Docker**
-
-En esta clase abordaremos `Python` como lenguaje fundamental para analítica de datos, con énfasis en la creación y gestión de ambientes virtuales. Exploraremos cómo Docker facilita la creación de entornos reproducibles y aprenderemos prácticas generales y recomendadas para desarrollar servicios analíticos.
-
-- Introducción básica a Docker.
-- Ambientes virtuales (`venv`, `conda`).
-- Construccion de imagen Docker con kernel `Python` para usar con [`JupyterLab`](https://jupyterlab.readthedocs.io/en/stable/getting_started/overview.html) y [`Vscode-server`](https://code.visualstudio.com/docs/remote/vscode-server)
-
----
-
-## 📌 **Clase 3 – Viernes, 14 de marzo de 2025**
-**Programación Orientada a Objetos y Documentación Profesional**
-
-Esta sesión abordará los principios fundamentales de la programación orientada a objetos en Python, mostrando cómo estructurar eficientemente proyectos complejos mediante modularización. Además, se explicará cómo documentar código utilizando docstrings con [`Sphinx`](https://www.sphinx-doc.org/en/master/) para asegurar calidad profesional en los proyectos desarrollados.
-
-- Conceptos clave de Programación Orientada a Objetos (OOP).
-- Modularización y creación de paquetes reutilizables.
-- Uso efectivo de docstrings para documentación del código.
-- Generación profesional de documentación con Sphinx.
+```plaintext
+mini-proyecto-oic/
+├── data/
+│   └── house_prices.csv
+├── models/
+│   └── modelo_regresion.pkl
+├── src/
+│   └── oic_model_houses/
+│       ├── api/
+│       │   ├── __init__.py
+│       │   └── routes/
+│       │       └── __init__.py
+│       ├── core/
+│       │   ├── __init__.py
+│       │   ├── config.py
+│       │   ├── database.py
+│       ├── models/
+│       │   ├── __init__.py
+│       │   └── prediction.py
+│       ├── services/
+│       │   ├── __init__.py
+│       │   └── prediction_service.py
+│       ├── __init__.py
+│       ├── main.py
+│       ├── regression_model.py
+│       └── streamlit_app.py
+├── Dockerfile
+├── docker-compose.yml
+├── environment.yml
+└── README.md
+```
 
 ---
 
-## 📌 **Clase 4 – Viernes, 21 de marzo de 2025**
-**Modelo Analítico con Regresión**
+## Paso 1: Clonar el Repositorio
 
-En esta clase profundizaremos en la creación y validación de modelos analíticos utilizando técnicas de regresión, apoyados en el dataset real "House Prices" de Kaggle. Aprenderemos a preparar los datos correctamente, construir modelos robustos, y exportar resultados en formatos listos para producción.
+```bash
+git clone https://github.com/lacamposm/desarrollo-analitico-oic.git
+cd mini-proyecto-oic
+```
 
-- Introducción a modelos analíticos utilizando regresión.
-- Exploración del dataset "House Prices" (Kaggle), preprocesamiento y modelado.
-- Exportación de modelos entrenados (formatos consumibles como `.pkl`).
-- Recomendaciones sobre documentación asociada al modelo.
+## Paso 2: Uso del Dockerfile
 
----
+Vamos a construir y probar la imagen Docker de forma independiente.
 
-## 📌 **Clase 5 – Martes, 25 de marzo de 2025**
-**Creación de APIs con FastAPI**
+### 1. Construcción de la Imagen
 
-Nos centraremos en cómo exponer modelos analíticos como servicios web utilizando FastAPI, una herramienta potente y moderna para construir APIs rápidas y fáciles de consumir. Aprenderemos conceptos clave sobre APIs REST, cómo implementar rutas y operaciones comunes, y buenas prácticas de desarrollo.
+Ejecuta el siguiente comando para construir la imagen desde el `Dockerfile`:
 
-- Introducción al desarrollo de servicios `REST` con `FastAPI`.
-- Implementación de métodos básicos: `GET`, `POST`.
-- Validación y documentación interactiva con `FastAPI`.
-- Buenas prácticas en el desarrollo de `APIs`.
+```sh
+docker build -t mini-proyecto-oic .
+```
 
----
-
-## 📌 **Clase 6 – Viernes, 28 de marzo de 2025**
-**Despliegue de Servicios Analíticos con Docker-compose y Streamlit**
-
-En esta sesión final aprenderemos cómo desplegar de manera eficiente nuestros servicios analíticos en ambientes controlados usando `docker-compose`. También desarrollaremos un frontend interactivo usando `Streamlit` para consumir nuestras APIs, completando así el flujo completo desde la creación del modelo hasta su puesta en producción de forma integral.
-
-- Despliegue del servicio analítico usando `docker-compose`.
-- Creación de una aplicación web sencilla con `Streamlit`.
-- Consumo del servicio analítico desde la aplicación web.
+Si la construcción fue exitosa, verás una salida similar a esta:
+```sh
+REPOSITORY TAG IMAGE ID CREATED SIZE mini-proyecto-oic latest abc123456789 X minutes ago 1.2GB
+```
 
 ---
 
-## ✅ **Objetivo final del curso:**
-Dotar a los participantes de habilidades prácticas, modernas y aplicables profesionalmente en entornos analíticos reales.
+### 2. Creación de un Contenedor
+
+Para probar la imagen antes de usar `docker-compose`, ejecuta un contenedor de manera manual:
+
+```sh
+docker run --rm -it mini-proyecto-oic bash
+```
+
+Este comando iniciará un shell interactivo dentro del contenedor. Dentro de este, puedes verificar que el entorno de 
+Conda esté activo y que las dependencias estén correctamente instaladas ejecutando:
+
+```sh
+bash
+conda list
+```
+
+Si todo está correcto, deberías ver la lista de paquetes instalados.
+
+Para salir del contenedor, usa:
+
+```sh
+exit
+```
+
+## Paso 3: Construcción y Ejecución de Servicios con Docker Compose
+
+Después de haber construido y probado la imagen Docker, podemos proceder a levantar los servicios completos utilizando `docker-compose`.
 
 ---
 
-🚩 **Nota:**  
-Se recomienda revisar constantemente los contenidos asignados de cada sesión para asegurar el máximo aprovechamiento de las sesiones prácticas.
+### 1. Configuración de `docker-compose.yml`
+
+Asegúrate de que el archivo `docker-compose.yml` esté correctamente configurado.
+
+### 2. Construcción y Levantamiento de Servicios
+
+Ejecuta los siguientes comandos para construir y ejecutar los servicios en segundo plano:
+
+```sh
+docker-compose build
+docker-compose up -d
+```
+
+Este proceso:
+
+- **Construirá la imagen** si no existe.
+- **Levantará los contenedores** definidos en `docker-compose.yml`.
+- **Iniciará la API con FastAPI**, la interfaz gráfica con Streamlit y la base de datos PostgreSQL.
+
+Para verificar que los contenedores están corriendo, usa el siguiente comando:
+
+```sh
+docker-compose ps
+```
+
+Si los servicios están funcionando correctamente, deberías ver una salida similar a esta:
+
+```nginx
+   Name                      Command               State           Ports
+----------------------------------------------------------------------------------
+mini-proyecto-oic-app-1      "uvicorn src.api_..." Up      0.0.0.0:8000->8000/tcp
+mini-proyecto-oic-db-1       "docker-entrypoin..." Up      0.0.0.0:5432->5432/tcp
+```
+
+### 3. Verificación de Servicios
+
+Una vez iniciados los servicios, verifica que estén accesibles:
+
+- **FastAPI (API y Documentación):**  
+  [http://localhost:8000/docs](http://localhost:8000/docs)
+
+  Puedes probar la API enviando una solicitud con `curl`:
+
+  ```sh
+  curl -X 'POST' 'http://localhost:8000/predict' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "feature1": 120.5,
+    "feature2": 45.3,
+    "feature3": "example_value"
+  }'
+  ```
+  La API responderá con:
+
+    ```json
+    {
+      "prediction": 250000.0
+    }
+    ```
+
+- **Streamlit (Interfaz Gráfica):**  
+  [http://localhost:8501](http://localhost:8501)
+
+   La interfaz de usuario te permitirá ingresar valores y recibir predicciones en tiempo real.
+
+- **PostgreSQL (Base de Datos):**  
+  La base de datos corre en `localhost:5432`. Puedes conectarte usando un cliente como `pgAdmin` o `psql`:
+
+  ```sh
+  psql -h localhost -U user -d dbname
+  ```
+
+    Para verificar que la base de datos está funcionando correctamente, puedes listar las tablas disponibles 
+    con:
+    
+    ```sql
+    \dt
+    ```
+    
+    Para consultar las predicciones almacenadas en la base de datos:
+    
+    ```sql
+    SELECT * FROM predictions;
+    ```
+    
+    Si necesitas realizar cambios en la estructura de la base de datos, puedes acceder a la terminal interactiva de 
+    `PostgreSQL` dentro del contenedor:
+    
+    ```shell
+    docker exec -it mini-proyecto-oic-db-1 psql -U user -d dbname
+    ```
+
+### 4. Administración de Contenedores
+
+Si necesitas ver los logs de los servicios en tiempo real, ejecuta:
+
+```sh
+docker compose logs -f
+```
+
+## Contribuciones
+
+Este es un repositorio privado. Si eres miembro del equipo y deseas contribuir, por favor sigue estas directrices:
+
+1. Crea una rama para tu feature o corrección de errores desde la rama principal (`git checkout -b feature/nueva-funcionalidad`).
+2. Realiza los cambios necesarios y haz commit de tus modificaciones (`git commit -m 'Añadir nueva funcionalidad'`).
+3. Haz push a tu rama (`git push origin feature/nueva-funcionalidad`).
+4. Abre un Pull Request (PR) en GitHub y describe los cambios realizados.
+5. Asegúrate de que tu código cumpla con las normas de estilo.
+6. Espera la revisión de tus compañeros de equipo y realiza los ajustes necesarios según sus comentarios.
+
+Gracias por tu contribución al proyecto.
+
+
+
