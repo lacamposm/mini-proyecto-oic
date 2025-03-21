@@ -1,0 +1,72 @@
+services:
+  oic-model-postgres:
+    image: postgres:15
+    container_name: oic-model-postgres
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    command: ["postgres"]
+    volumes:
+      - oic-db-model-service:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_network
+
+  oic-model-api:
+    build: .
+    container_name: oic-model-api
+    depends_on:
+      oic-model-postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      PYTHONUNBUFFERED: "1"
+      DATABASE_URL: ${DATABASE_URL}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./oic_model_server:/mini-proyecto-oic/oic_model_server
+      - ./data/house_prices.csv:/mini-proyecto-oic/house_prices.csv
+    networks:
+      - app_network
+    command: >
+      sh -c "conda run --live-stream -n oic-model-server uvicorn oic_model_server.main:app --host 0.0.0.0 --port 8000 --reload"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  oic-model-streamlit:
+    build: .
+    container_name: oic-model-streamlit
+    depends_on:
+      oic-model-api:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      PYTHONUNBUFFERED: "1"
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./streamlit_app.py:/mini-proyecto-oic/streamlit_app.py
+    networks:
+      - app_network
+    command: >
+      sh -c "conda run --live-stream -n oic-model-server streamlit run streamlit_app.py --server.port 8501"
+  
+volumes:
+  oic-db-model-service:
+
+networks:
+  app_network:
+    driver: bridge

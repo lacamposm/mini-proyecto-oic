@@ -1,0 +1,21 @@
+name: oic-model-server
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - pandas
+  - scikit-learn
+  - fastapi
+  - uvicorn
+  - streamlit
+  - pydantic
+  - numpy
+  - sqlmodel
+  - pydantic-settings
+  - psycopg2
+  - pip:
+      - notebook
+      - pip
+      - joblib
+      - python-multipart
