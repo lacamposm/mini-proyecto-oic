@@ -9,9 +9,11 @@ from sqlmodel import SQLModel
 
 from oic_model_server.models import *
 
-from oic_model_server.api.routes import user as user_router
+from oic_model_server.api.routes import user_router, predict_router
 
 from oic_model_server.core.database import engine
+
+from oic_model_server.services.raw_data_service import load_raw_data_to_db
 
 
 @asynccontextmanager
@@ -28,10 +30,16 @@ async def lifespan(app: FastAPI):
     :yield: Control de vuelta a la aplicación hasta el apagado.
     """
     SQLModel.metadata.create_all(bind=engine)
-    print("🚀 API is up and running!")
+
+    try:
+        load_raw_data_to_db("house_prices.csv")
+    except Exception as e:
+            print(f"❌ Error al cargar datos desde el CSV: {e}")
+
+    print("🚀 ¡OIC-MODEL-API está en funcionamiento!🚀")
     await asyncio.sleep(0)
     yield
-    print("🛑 API shutting down...")
+    print("🚧 La API se está apagando... 🛑")
 
 
 def create_application() -> FastAPI:
@@ -51,7 +59,8 @@ def create_application() -> FastAPI:
         lifespan=lifespan
     )
 
-    app.include_router(user_router.router, prefix="/users", tags=["users"])
+    app.include_router(user_router, prefix="/users", tags=["users"])
+    app.include_router(predict_router, prefix="/predict", tags=["predict"])
 
     return app
 

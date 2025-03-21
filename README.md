@@ -20,6 +20,7 @@ mini-proyecto-oic/
 │   │   ├── __init__.py
 │   │   └── routes/
 │   │       ├── __init__.py
+│   │       ├── predict.py
 │   │       └── user.py
 │   ├── core/
 │   │   ├── __init__.py
@@ -28,10 +29,12 @@ mini-proyecto-oic/
 │   ├── models/
 │   │   ├── __init__.py
 │   │   ├── predict.py
+│   │   ├── raw_data.py
 │   │   └── user.py
 │   ├── services/
 │   │   ├── __init__.py
 │   │   ├── predict_service.py
+│   │   ├── raw_data_service.py
 │   │   └── user_service.py
 │   ├── __init__.py
 │   └── main.py
@@ -103,11 +106,11 @@ Este comando:
 Para ejecutar servicios como Jupyter o la API con puertos accesibles:
 
 ```sh
-docker run -it --rm -p 8888:8888 -p 8080:8080 -v "$(pwd)":/$(basename "$(pwd)") -w /$(basename "$(pwd)") oic-model-service
+docker run -it --rm -p 8000:8000 -p 8501:8501 -p 8888:8888 -p 8080:8080 -v "$(pwd)":/$(basename "$(pwd)") -w /$(basename "$(pwd)") oic-model-service
 ```
 
 Este comando:
-- Expone los puertos 8888 (Jupyter) y 8080 (API)
+- Expone los puertos 8000 (API), 8080 (VS-code), 8501 (streamlit) y 8888 (Jupyter) 
 - Monta el directorio actual como volumen
 - Permite acceder a los servicios desde el navegador local
 
@@ -133,7 +136,7 @@ Después de haber construido y probado la imagen Docker, podemos proceder a leva
 
 ### 1. Configuración de `docker-compose.yml`
 
-Asegúrate de que el archivo `docker-compose.yml` esté correctamente configurado.
+Revisa el archivo `docker-compose.yml`
 
 ### 2. Construcción y Levantamiento de Servicios
 
@@ -173,19 +176,28 @@ Este proceso:
 - **Levantará los contenedores** definidos en `docker-compose.yml` en modo detached (segundo plano)
 - **Iniciará la API con FastAPI**, la interfaz gráfica con Streamlit y la base de datos PostgreSQL
 
+#### Opción D: Iniciar solo el servicio de PostgreSQL
+
+```sh
+docker-compose -p oic-api-service up oic-model-postgres
+```
+
+Este comando:
+- Inicia únicamente el servicio de base de datos PostgreSQL
+- Mantiene el nombre de proyecto consistente con el resto del stack
+- Es útil cuando necesitas trabajar solo con la base de datos sin levantar otros servicios
+- Permite realizar pruebas de conexión, modificaciones de esquema o consultas directas
+
+Una vez inicializado el servicio de PostgreSQL, puedes conectarte a él usando:
+
+```sh
+docker exec -it oic-model-postgres psql -U postgres -d postgres
+```
+
 Para verificar que los contenedores están corriendo, usa el siguiente comando:
 
 ```sh
 docker-compose ps
-```
-
-Si los servicios están funcionando correctamente, deberías ver una salida similar a esta:
-
-```nginx
-   Name                      Command               State           Ports
-----------------------------------------------------------------------------------
-mini-proyecto-oic-app-1      "uvicorn src.api_..." Up      0.0.0.0:8000->8000/tcp
-mini-proyecto-oic-db-1       "docker-entrypoin..." Up      0.0.0.0:5432->5432/tcp
 ```
 
 ### 3. Verificación de Servicios
@@ -198,12 +210,14 @@ Una vez iniciados los servicios, verifica que estén accesibles:
   Puedes probar la API enviando una solicitud con `curl`:
 
   ```sh
-  curl -X 'POST' 'http://localhost:8000/predict' \
+  curl -X 'POST' \
+  'http://0.0.0.0:8000/predict/?user_name=Francisco%20Belez' \
+  -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
-    "feature1": 120.5,
-    "feature2": 45.3,
-    "feature3": "example_value"
+  "metros_cuadrados": 1,
+  "num_habitaciones": 0,
+  "ubicacion": "Centro"
   }'
   ```
   La API responderá con:
@@ -220,7 +234,7 @@ Una vez iniciados los servicios, verifica que estén accesibles:
    La interfaz de usuario te permitirá ingresar valores y recibir predicciones en tiempo real.
 
 - **PostgreSQL (Base de Datos):**  
-  La base de datos corre en `localhost:5432`. Puedes conectarte usando un cliente como `pgAdmin` o `psql`:
+  La base de datos corre en `localhost:5433`. Puedes conectarte usando un cliente como `pgAdmin` o `psql`:
 
   ```sh
   psql -U postgres
@@ -243,7 +257,7 @@ Una vez iniciados los servicios, verifica que estén accesibles:
     `PostgreSQL` dentro del contenedor:
     
     ```shell
-        docker exec -it oic-api-service_db_1 psql -U postgres -d postgres
+    docker exec -it oic-model-postgres psql -U postgres -d postgres
     ```
 
 ### 4. Administración de Contenedores
@@ -268,7 +282,7 @@ docker-compose down -v
 
 ## Contribuciones
 
-Este es un repositorio privado. Si eres miembro del equipo y deseas contribuir, por favor sigue estas directrices:
+Si eres miembro del equipo y deseas contribuir, por favor sigue estas directrices:
 
 1. Crea una rama para tu feature o corrección de errores desde la rama principal (`git checkout -b feature/nueva-funcionalidad`).
 2. Realiza los cambios necesarios y haz commit de tus modificaciones (`git commit -m 'Añadir nueva funcionalidad'`).

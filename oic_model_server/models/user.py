@@ -14,15 +14,15 @@ class UserTable(SQLModel, table=True):
 
     Esta clase define la estructura de la tabla ``users`` con los siguientes campos:
 
-    - **user_id**: Identificador único del usuario.
-    - **user_name**: Nombre de usuario único.
-    - **created_at**: Fecha y hora de creación del registro.
-    - **updated_at**: Fecha y hora de la última actualización.
+    - `user_id`: Identificador único del usuario.
+    - `user_name`: Nombre de usuario único.
+    - `created_at`: Fecha y hora de creación del registro.
+    - `updated_at`: Fecha y hora de la última actualización.
 
-    :cvar str user_id: Identificador único generado automáticamente.
-    :cvar str user_name: Nombre de usuario único.
-    :cvar datetime created_at: Fecha y hora de creación, generada automáticamente.
-    :cvar datetime updated_at: Fecha y hora de la última actualización, generada automáticamente.
+    :param str user_id: Identificador único generado automáticamente.
+    :param str user_name: Nombre de usuario único.
+    :param datetime created_at: Fecha y hora de creación, generada automáticamente.
+    :param datetime updated_at: Fecha y hora de la última actualización, generada automáticamente.
     """
     __tablename__ = "users"
 
@@ -33,7 +33,8 @@ class UserTable(SQLModel, table=True):
     )
     user_name: str = SQLModelField(
         nullable=False,
-        index=True
+        index=True,
+        unique=True
     )
     created_at: datetime = SQLModelField(
         default_factory=datetime.now,
@@ -73,10 +74,6 @@ class UserRead(BaseModel):
     user_id: str = Field(..., description="Identificador interno único")
     user_name: str = Field(..., description="Nombre de usuario único")
 
-    class Config:
-        """
-        Configuración adicional para el modelo Pydantic.
-
-        Se activa el modo ORM para permitir la conversión directa desde instancias ORM.
-        """
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }

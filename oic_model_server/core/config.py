@@ -1,4 +1,4 @@
-# oic_model_houses/core/config.py
+# oic_model_server/core/config.py
 import os
 
 from pydantic_settings import BaseSettings

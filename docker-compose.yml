@@ -34,6 +34,7 @@ services:
       - "8000:8000"
     volumes:
       - ./oic_model_server:/mini-proyecto-oic/oic_model_server
+      - ./data/house_prices.csv:/mini-proyecto-oic/house_prices.csv
     networks:
       - app_network
     command: >

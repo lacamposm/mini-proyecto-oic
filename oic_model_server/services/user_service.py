@@ -10,35 +10,37 @@ class UserService:
     """
     Servicio de usuario.
 
-    Proporciona métodos para inscribir un usuario y obtener la información del usuario.
+    Proporciona métodos para registrar un nuevo usuario y obtener su información.
     """
+
     def __init__(self, db: Session):
         """
-        Initialize the ThreadService with a database session.
+        Inicializa el servicio con una sesión de base de datos.
 
-        :param db: The database session to use for interacting with the database.
+        :param db: Sesión activa para interactuar con la base de datos.
         :type db: Session
         """
         self.db = db
-    
-    
+
     def create_user(self, request: UserCreate) -> UserTable:
         """
-        Create a new user in the database.
+        Crea un nuevo usuario en la base de datos.
 
-        :param request: The request object containing the details for creating a new user.
+        Este método valida que no exista previamente un usuario con el mismo nombre.
+        En caso de que exista, lanza una excepción HTTP con código 400.
+
+        :param request: Objeto con la información necesaria para registrar un usuario.
         :type request: UserCreate
-        :return: The newly created user.
+        :return: El usuario recién creado.
         :rtype: UserTable
-        :raises HTTPException: If a user with the given name already exists.
+        :raises HTTPException: Si ya existe un usuario con el nombre proporcionado.
         """
         existing_user = self.db.exec(
             select(UserTable).where(UserTable.user_name == request.user_name)
         ).first()
+
         if existing_user:
-            raise HTTPException(
-                status_code=400, detail="User with given name already exists."
-            )
+            raise HTTPException(status_code=400, detail="Ya existe un usuario con ese nombre.")
 
         new_user = UserTable(user_name=request.user_name)
         self.db.add(new_user)
