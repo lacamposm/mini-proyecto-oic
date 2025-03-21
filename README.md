@@ -1,7 +1,6 @@
-# Servicio OIC-MODEL
+# OIC-API-MODEL
 
-Este repositorio contiene un modelo analítico basado en regresión lineal, integrado con FastAPI, PostgreSQL y una 
-interfaz gráfica desarrollada en Streamlit, todo encapsulado y dockerizado para facilitar el despliegue.
+Este repositorio contiene un modelo analítico basado en regresión lineal, integrado con [FastAPI](https://fastapi.tiangolo.com/), [PostgreSQL](https://www.postgresql.org/) y una interfaz gráfica desarrollada en [Streamlit](https://streamlit.io/), todo encapsulado y dockerizado para facilitar el despliegue.
 
 ---
 
@@ -50,13 +49,13 @@ mini-proyecto-oic/
 ## Paso 1: Clonar el Repositorio
 
 ```bash
-git clone https://github.com/lacamposm/desarrollo-analitico-oic.git
+git clone https://github.com/lacamposm/mini-proyecto-oic.git
 cd mini-proyecto-oic
 ```
 
 ## Paso 2: Uso del Dockerfile
 
-El proyecto ofrece varias formas de trabajar con Docker según tus necesidades:
+El proyecto ofrece varias formas de trabajar con `Docker` según tus necesidades:
 
 ### 1. Construcción de la Imagen
 
@@ -92,9 +91,18 @@ conda list
 
 Para desarrollar mientras los cambios se reflejan en tiempo real:
 
-```sh
-docker run -it --rm -v "$(pwd)":/$(basename "$(pwd)") -w /$(basename "$(pwd)") oic-model-service /bin/bash
-```
+- Linux:
+
+    ```sh
+    docker run -it --rm -v "$(pwd)":/$(basename "$(pwd)") -w /$(basename "$(pwd)") oic-model-service /bin/bash
+    ```
+
+- Windows:
+
+    ```powershell
+    docker run -it --rm -v "${PWD}:/$(Split-Path -Leaf ${PWD})" -w "/$(Split-Path -Leaf ${PWD})" oic-model-service /bin/bash
+    ```
+
 
 Este comando:
 - Monta el directorio actual como un volumen en el contenedor
@@ -103,11 +111,19 @@ Este comando:
 
 #### Opción C: Servicios con Puertos Expuestos
 
-Para ejecutar servicios como Jupyter o la API con puertos accesibles:
+Para ejecutar servicios como Jupyter, app de Streamlit o la API con puertos accesibles:
 
-```sh
-docker run -it --rm -p 8000:8000 -p 8501:8501 -p 8888:8888 -p 8080:8080 -v "$(pwd)":/$(basename "$(pwd)") -w /$(basename "$(pwd)") oic-model-service
-```
+- Linux:
+
+    ```sh
+    docker run -it --rm -p 8000:8000 -p 8501:8501 -p 8888:8888 -p 8080:8080 -v "$(pwd)":/$(basename "$(pwd)") -w /$(basename "$(pwd)") oic-model-service
+    ```
+
+- Windows:
+
+    ```powershell
+    docker run -it --rm -p 8000:8000 -p 8501:8501 -p 8888:8888 -p 8080:8080 -v "${PWD}:/$(Split-Path -Leaf ${PWD})" -w "/$(Split-Path -Leaf ${PWD})" oic-model-service
+    ```
 
 Este comando:
 - Expone los puertos 8000 (API), 8080 (VS-code), 8501 (streamlit) y 8888 (Jupyter) 
@@ -116,9 +132,8 @@ Este comando:
 
 Una vez que el contenedor esté en ejecución, podrás acceder a los servicios en:
 
-- **Jupyter Notebook:** [http://localhost:8888](http://localhost:8888)
-  - Si se requiere un token de acceso, revisa los logs del contenedor para encontrarlo.
-
+- **Jupyter Notebooks:** [http://localhost:8888](http://localhost:8888)
+  
 - **VS Code-Server:** [http://localhost:8080/?folder=/mini-proyecto-oic](http://localhost:8080/?folder=/mini-proyecto-oic)
 
 
@@ -136,7 +151,7 @@ Después de haber construido y probado la imagen Docker, podemos proceder a leva
 
 ### 1. Configuración de `docker-compose.yml`
 
-Revisa el archivo `docker-compose.yml`
+Revisa el archivo `docker-compose.yml` ademas no olvides crear el archivo `.env` en la raiz del proyecto siguiente el template en `.env.example`
 
 ### 2. Construcción y Levantamiento de Servicios
 
@@ -172,9 +187,9 @@ docker-compose up -d
 ```
 
 Este proceso:
-- **Construirá la imagen** si no existe
-- **Levantará los contenedores** definidos en `docker-compose.yml` en modo detached (segundo plano)
-- **Iniciará la API con FastAPI**, la interfaz gráfica con Streamlit y la base de datos PostgreSQL
+- Construirá la imagen si no existe
+- Levantará los contenedores definidos en `docker-compose.yml` en modo detached (segundo plano)
+- Iniciará la API con `FastAPI`, la interfaz gráfica con `Streamlit` y la base de datos `PostgreSQL`
 
 #### Opción D: Iniciar solo el servicio de PostgreSQL
 
@@ -253,12 +268,8 @@ Una vez iniciados los servicios, verifica que estén accesibles:
     SELECT * FROM predictions;
     ```
     
-    Si necesitas realizar cambios en la estructura de la base de datos, puedes acceder a la terminal interactiva de 
-    `PostgreSQL` dentro del contenedor:
-    
-    ```shell
-    docker exec -it oic-model-postgres psql -U postgres -d postgres
-    ```
+    Si necesitas realizar cambios en la estructura de la base de datos, puedes acceder a la terminal interactiva de `PostgreSQL` dentro del contenedor.
+
 
 ### 4. Administración de Contenedores
 
@@ -290,8 +301,3 @@ Si eres miembro del equipo y deseas contribuir, por favor sigue estas directrice
 4. Abre un Pull Request (PR) en GitHub y describe los cambios realizados.
 5. Asegúrate de que tu código cumpla con las normas de estilo.
 6. Espera la revisión de tus compañeros de equipo y realiza los ajustes necesarios según sus comentarios.
-
-Gracias por tu contribución al proyecto.
-
-
-
