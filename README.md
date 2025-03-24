@@ -209,11 +209,28 @@ Una vez inicializado el servicio de PostgreSQL, puedes conectarte a él usando:
 docker exec -it oic-model-postgres psql -U postgres -d postgres
 ```
 
-Para verificar que los contenedores están corriendo, usa el siguiente comando:
 
-```sh
-docker-compose ps
+Para verificar que la base de datos está funcionando correctamente, puedes listar las tablas disponibles 
+con:
+
+```sql
+\dt
 ```
+    
+Para consultar las predicciones almacenadas en la base de datos:
+
+```sql
+SELECT * FROM predictions;
+```
+
+Si necesitas realizar cambios en la estructura de la base de datos, puedes acceder a la terminal interactiva de `PostgreSQL` dentro del contenedor.
+
+***Nota:*** 
+ Para verificar que los contenedores están corriendo, usa el siguiente comando:
+
+  ```sh
+  docker-compose ps
+  ```
 
 ### 3. Verificación de Servicios
 
@@ -250,25 +267,6 @@ Una vez iniciados los servicios, verifica que estén accesibles:
 
 - **PostgreSQL (Base de Datos):**  
   La base de datos corre en `localhost:5433`. Puedes conectarte usando un cliente como `pgAdmin` o `psql`:
-
-  ```sh
-  psql -U postgres
-  ```
-
-    Para verificar que la base de datos está funcionando correctamente, puedes listar las tablas disponibles 
-    con:
-    
-    ```sql
-    \dt
-    ```
-    
-    Para consultar las predicciones almacenadas en la base de datos:
-    
-    ```sql
-    SELECT * FROM predictions;
-    ```
-    
-    Si necesitas realizar cambios en la estructura de la base de datos, puedes acceder a la terminal interactiva de `PostgreSQL` dentro del contenedor.
 
 
 ### 4. Administración de Contenedores

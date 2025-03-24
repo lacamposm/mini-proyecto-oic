@@ -20,7 +20,10 @@ services:
       - app_network
 
   oic-model-api:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: oic-model-service:latest
     container_name: oic-model-api
     depends_on:
       oic-model-postgres:
@@ -34,7 +37,7 @@ services:
       - "8000:8000"
     volumes:
       - ./oic_model_server:/mini-proyecto-oic/oic_model_server
-      - ./data/house_prices.csv:/mini-proyecto-oic/house_prices.csv
+      - ./data/kc_house_data.csv:/mini-proyecto-oic/kc_house_data.csv
     networks:
       - app_network
     command: >
@@ -46,7 +49,7 @@ services:
       retries: 3
 
   oic-model-streamlit:
-    build: .
+    image: oic-model-service:latest
     container_name: oic-model-streamlit
     depends_on:
       oic-model-api:
@@ -70,3 +73,4 @@ volumes:
 networks:
   app_network:
     driver: bridge
+

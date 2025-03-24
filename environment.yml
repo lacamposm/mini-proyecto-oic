@@ -4,18 +4,26 @@ channels:
   - defaults
 dependencies:
   - python=3.12
+  - numpy
   - pandas
   - scikit-learn
+  - matplotlib
+  - seaborn
+  - plotly
+  - sqlalchemy
   - fastapi
   - uvicorn
-  - streamlit
-  - pydantic
-  - numpy
+  - pydantic  
   - sqlmodel
   - pydantic-settings
   - psycopg2
+  - geopandas
+  - folium
+  - fiona  
+  - requests
+  - streamlit
   - pip:
-      - notebook
+      - jupyter
       - pip
       - joblib
       - python-multipart
