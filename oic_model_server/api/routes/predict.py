@@ -19,6 +19,7 @@ router = APIRouter()
 def predecir(request: PredictRequest, user_name: str, db: Session = Depends(get_db)):
     """
     Endpoint para realizar una predicción de valor de venta y registrar el resultado en la base de datos.
+    \f
 
     :param request: Datos de entrada del inmueble (área, habitaciones, ubicación).
     :type request: PredictRequest

@@ -9,12 +9,6 @@ Este repositorio contiene un modelo analítico basado en regresión lineal, inte
 ```plaintext
 mini-proyecto-oic/
 ├── data/
-│   ├── geo/
-│   │   ├── kc_houses.cpg
-│   │   └── kc_houses.dbf
-│   │   ├── kc_houses.prj
-│   │   └── kc_houses.shp
-│   │   ├── kc_houses.shx
 │   └── kc_house_data.csv
 ├── model/
 │   ├── __init__.py
@@ -155,7 +149,7 @@ Después de haber construido y probado la imagen Docker, podemos proceder a leva
 
 ### 1. Configuración de `docker-compose.yml`
 
-Revisa el archivo `docker-compose.yml` ademas no olvides crear el archivo `.env` en la raiz del proyecto siguiente el template en `.env.example`
+Revisa el archivo `docker-compose.yml` ademas no olvides crear el archivo `.env` en la raiz del proyecto siguiendo el template en `.env.example`
 
 ### 2. Construcción y Levantamiento de Servicios
 
