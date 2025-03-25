@@ -39,7 +39,7 @@ def load_house_raw_data_to_db(csv_path: str):
                 ).first() if house_id else None
 
                 if not existing:
-                    # Construir objeto para inserción con manejo adecuado de valores nulos
+                    
                     house_data = HouseRawDataTable(
                         id=int(house_id) if house_id else None,
                         date=row.get("date") if row.get("date") else None,

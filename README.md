@@ -1,4 +1,4 @@
-# OIC-API-MODEL
+# OIC-MODEL-SERVICE
 
 Este repositorio contiene un modelo analítico basado en regresión lineal, integrado con [FastAPI](https://fastapi.tiangolo.com/), [PostgreSQL](https://www.postgresql.org/) y una interfaz gráfica desarrollada en [Streamlit](https://streamlit.io/), todo encapsulado y dockerizado para facilitar el despliegue.
 
@@ -9,7 +9,13 @@ Este repositorio contiene un modelo analítico basado en regresión lineal, inte
 ```plaintext
 mini-proyecto-oic/
 ├── data/
-│   └── house_prices.csv
+│   ├── geo/
+│   │   ├── kc_houses.cpg
+│   │   └── kc_houses.dbf
+│   │   ├── kc_houses.prj
+│   │   └── kc_houses.shp
+│   │   ├── kc_houses.shx
+│   └── kc_house_data.csv
 ├── model/
 │   ├── __init__.py
 │   ├── modelo_regresion.pkl
@@ -109,31 +115,29 @@ Este comando:
 - Establece el directorio de trabajo al nombre de la carpeta actual
 - Abre un shell interactivo
 
-#### Opción C: Servicios con Puertos Expuestos
+#### Opción C: Servicio VS-codeserver.
 
-Para ejecutar servicios como Jupyter, app de Streamlit o la API con puertos accesibles:
+Para ejecutar codeserver como IDE en el puerto 8000:
 
 - Linux:
 
     ```sh
-    docker run -it --rm -p 8000:8000 -p 8501:8501 -p 8888:8888 -p 8080:8080 -v "$(pwd)":/$(basename "$(pwd)") -w /$(basename "$(pwd)") oic-model-service
+    docker run -it --rm -p 8080:8080 -v "$(pwd)":/$(basename "$(pwd)") -w /$(basename "$(pwd)") oic-model-service
     ```
 
 - Windows:
 
     ```powershell
-    docker run -it --rm -p 8000:8000 -p 8501:8501 -p 8888:8888 -p 8080:8080 -v "${PWD}:/$(Split-Path -Leaf ${PWD})" -w "/$(Split-Path -Leaf ${PWD})" oic-model-service
+    docker run -it --rm -p 8000:8000 -v "${PWD}:/$(Split-Path -Leaf ${PWD})" -w "/$(Split-Path -Leaf ${PWD})" oic-model-service
     ```
 
 Este comando:
-- Expone los puertos 8000 (API), 8080 (VS-code), 8501 (streamlit) y 8888 (Jupyter) 
+- Expone el puerto 8080 para VS-codeserver. 
 - Monta el directorio actual como volumen
 - Permite acceder a los servicios desde el navegador local
 
-Una vez que el contenedor esté en ejecución, podrás acceder a los servicios en:
+Una vez que el contenedor esté en ejecución, podrás acceder al IDE en:
 
-- **Jupyter Notebooks:** [http://localhost:8888](http://localhost:8888)
-  
 - **VS Code-Server:** [http://localhost:8080/?folder=/mini-proyecto-oic](http://localhost:8080/?folder=/mini-proyecto-oic)
 
 
@@ -191,7 +195,97 @@ Este proceso:
 - Levantará los contenedores definidos en `docker-compose.yml` en modo detached (segundo plano)
 - Iniciará la API con `FastAPI`, la interfaz gráfica con `Streamlit` y la base de datos `PostgreSQL`
 
-#### Opción D: Iniciar solo el servicio de PostgreSQL
+***Nota:*** 
+ Para verificar que los contenedores están corriendo, usa el siguiente comando:
+
+  ```sh
+  docker-compose ps
+  ```
+
+### 3. Verificación de Servicios Completos.
+
+Una vez iniciados los servicios, verifica que estén accesibles:
+
+- **FastAPI (API y Documentación):**  
+  [http://localhost:8000/docs](http://localhost:8000/docs)
+
+  Puedes probar la API enviando una solicitud con `curl`:
+
+  ```sh
+  curl -X 'POST' \
+  'http://0.0.0.0:8000/predict/?user_name=Francisco%20Belez' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "metros_cuadrados": 1,
+  "num_habitaciones": 0,
+  "ubicacion": "Centro"
+  }'
+  ```
+  La API responderá con:
+
+    ```json
+    {
+      "prediction": 250000.0
+    }
+    ```
+
+- **Streamlit (Interfaz Gráfica):**  
+  [http://localhost:8501](http://localhost:8501)
+
+   La interfaz de usuario te permitirá ingresar valores y recibir predicciones en tiempo real.
+
+- **code-server (IDE en Navegador):** 
+
+  [http://localhost:8080/?folder=/mini-proyecto-oic](http://localhost:8080/?folder=/mini-proyecto-oic)
+
+  Te permite acceder a un IDE en el navegador para construir o editar tu proyecto en tiempo real.
+
+- **PostgreSQL (Base de Datos):**  
+  La base de datos corre en `localhost:5433`. Puedes conectarte usando un cliente como `pgAdmin` o `psql`.
+
+### 4. Administración de Contenedores
+
+Si necesitas ver los logs de los servicios en tiempo real, ejecuta:
+
+```sh
+docker-compose logs -f
+```
+
+Para detener los servicios:
+
+```sh
+docker-compose down
+```
+
+Para detener los servicios y eliminar volúmenes:
+
+```sh
+docker-compose down -v
+```
+
+---
+
+## Servicios Independientes
+
+
+### 1. Iniciar solo el servicio de code-server
+
+```sh
+docker-compose -p oic-api-service up oic-codeserver
+```
+
+Este comando:
+
+- Inicia únicamente el servicio de code-server
+- Mantiene el nombre de proyecto consistente con el resto del stack
+- Es útil cuando necesitas desarrollar sobre el proyecto completo (API-MODEL-UI).
+
+Una vez que el contenedor esté en ejecución, podrás acceder al IDE en:
+
+- **VS Code-Server:** [http://localhost:8080/?folder=/mini-proyecto-oic](http://localhost:8080/?folder=/mini-proyecto-oic)
+
+### 2. Iniciar solo el servicio de PostgreSQL
 
 ```sh
 docker-compose -p oic-api-service up oic-model-postgres
@@ -225,69 +319,9 @@ SELECT * FROM predictions;
 
 Si necesitas realizar cambios en la estructura de la base de datos, puedes acceder a la terminal interactiva de `PostgreSQL` dentro del contenedor.
 
-***Nota:*** 
- Para verificar que los contenedores están corriendo, usa el siguiente comando:
-
-  ```sh
-  docker-compose ps
-  ```
-
-### 3. Verificación de Servicios
-
-Una vez iniciados los servicios, verifica que estén accesibles:
-
-- **FastAPI (API y Documentación):**  
-  [http://localhost:8000/docs](http://localhost:8000/docs)
-
-  Puedes probar la API enviando una solicitud con `curl`:
-
-  ```sh
-  curl -X 'POST' \
-  'http://0.0.0.0:8000/predict/?user_name=Francisco%20Belez' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "metros_cuadrados": 1,
-  "num_habitaciones": 0,
-  "ubicacion": "Centro"
-  }'
-  ```
-  La API responderá con:
-
-    ```json
-    {
-      "prediction": 250000.0
-    }
-    ```
-
-- **Streamlit (Interfaz Gráfica):**  
-  [http://localhost:8501](http://localhost:8501)
-
-   La interfaz de usuario te permitirá ingresar valores y recibir predicciones en tiempo real.
-
-- **PostgreSQL (Base de Datos):**  
-  La base de datos corre en `localhost:5433`. Puedes conectarte usando un cliente como `pgAdmin` o `psql`:
 
 
-### 4. Administración de Contenedores
 
-Si necesitas ver los logs de los servicios en tiempo real, ejecuta:
-
-```sh
-docker-compose logs -f
-```
-
-Para detener los servicios:
-
-```sh
-docker-compose down
-```
-
-Para detener los servicios y eliminar volúmenes:
-
-```sh
-docker-compose down -v
-```
 
 ## Contribuciones
 

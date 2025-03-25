@@ -22,8 +22,7 @@ dependencies:
   - fiona  
   - requests
   - streamlit
-  - pip:
-      - jupyter
-      - pip
-      - joblib
-      - python-multipart
+  - jupyter
+  - pip
+  - joblib
+  - python-multipart

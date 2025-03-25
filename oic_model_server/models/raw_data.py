@@ -16,47 +16,28 @@ class HouseRawDataTable(SQLModel, table=True):
 
     :param id: Identificador único de la propiedad. Se genera automáticamente en la base de datos.
     :param date: Fecha de la venta. Puede ser nulo.
-    :type date: Optional[str]
     :param price: Precio de venta de la propiedad en dólares. Debe ser mayor que 0.
-    :type price: Optional[float]
     :param bedrooms: Número de dormitorios. Puede ser nulo.
-    :type bedrooms: Optional[int]
     :param bathrooms: Número de baños (puede incluir decimales para baños parciales). Puede ser nulo.
-    :type bathrooms: Optional[float]
     :param sqft_living: Superficie habitable en pies cuadrados. Puede ser nulo.
-    :type sqft_living: Optional[int]
     :param sqft_lot: Superficie del terreno en pies cuadrados. Puede ser nulo.
-    :type sqft_lot: Optional[int]
     :param floors: Número de pisos (puede incluir decimales). Puede ser nulo.
-    :type floors: Optional[float]
     :param waterfront: Indica si la propiedad tiene vista al agua (1) o no (0). Puede ser nulo.
-    :type waterfront: Optional[int]
     :param view: Índice de calidad de la vista de la propiedad (0-4). Puede ser nulo.
-    :type view: Optional[int]
     :param condition: Índice de condición general de la propiedad (1-5). Puede ser nulo.
-    :type condition: Optional[int]
     :param grade: Índice de calidad de construcción de la propiedad (1-13). Puede ser nulo.
-    :type grade: Optional[int]
     :param sqft_above: Superficie sobre el nivel del suelo en pies cuadrados. Puede ser nulo.
-    :type sqft_above: Optional[int]
     :param sqft_basement: Superficie del sótano en pies cuadrados. Puede ser nulo.
-    :type sqft_basement: Optional[int]
     :param yr_built: Año de construcción de la propiedad. Puede ser nulo.
-    :type yr_built: Optional[int]
     :param yr_renovated: Año de la última renovación (0 si no se ha renovado). Puede ser nulo.
-    :type yr_renovated: Optional[int]
     :param zipcode: Código postal de la ubicación de la propiedad. Puede ser nulo.
-    :type zipcode: Optional[int]
     :param lat: Latitud geográfica. Puede ser nulo.
-    :type lat: Optional[float]
     :param long: Longitud geográfica. Puede ser nulo.
-    :type long: Optional[float]
     :param sqft_living15: Superficie media habitable de las 15 propiedades más cercanas en pies cuadrados. Puede ser nulo.
-    :type sqft_living15: Optional[int]
     :param sqft_lot15: Superficie media de terreno de las 15 propiedades más cercanas en pies cuadrados. Puede ser nulo.
-    :type sqft_lot15: Optional[int]
     """
     __tablename__ = "houses_raw_data"    
+    
     
     id: Optional[int] = SQLModelField(
         default=None, 
