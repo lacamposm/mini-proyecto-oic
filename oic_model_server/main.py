@@ -13,7 +13,7 @@ from oic_model_server.api.routes import user_router, predict_router
 
 from oic_model_server.core.database import engine
 
-from oic_model_server.services.raw_data_service import load_raw_data_to_db
+from oic_model_server.services.raw_data_service import load_house_raw_data_to_db
 
 
 @asynccontextmanager
@@ -32,7 +32,7 @@ async def lifespan(app: FastAPI):
     SQLModel.metadata.create_all(bind=engine)
 
     try:
-        load_raw_data_to_db("house_prices.csv")
+        load_house_raw_data_to_db("kc_house_data.csv")
     except Exception as e:
             print(f"❌ Error al cargar datos desde el CSV: {e}")
 
