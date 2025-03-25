@@ -13,7 +13,7 @@ from oic_model_server.api.routes import user_router, predict_router
 
 from oic_model_server.core.database import engine
 
-from oic_model_server.services.raw_data_service import load_house_raw_data_to_db
+from oic_model_server.services.raw_data_service import load_house_raw_data_to_db, load_geo_house_raw_data_to_db
 
 
 @asynccontextmanager
@@ -33,8 +33,14 @@ async def lifespan(app: FastAPI):
 
     try:
         load_house_raw_data_to_db("kc_house_data.csv")
+        load_geo_house_raw_data_to_db()
     except Exception as e:
-            print(f"❌ Error al cargar datos desde el CSV: {e}")
+            print(f"❌ Error al cargar datos desde el CSV o al generar la GeoData: {e}")
+            
+    try:
+        load_geo_house_raw_data_to_db()
+    except Exception as e:
+            print(f"❌ Error al cargar datos Geograficos: {e}")
 
     print("🚀 ¡OIC-MODEL-API está en funcionamiento!🚀")
     await asyncio.sleep(0)

@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     PROJECT_VERSION: str = "0.1.0"
     DATABASE_URL: str = os.getenv(
         "DATABASE_URL",
-        "postgresql://postgres:postgres@oic-model-postgres:5432/postgres",
+        "postgresql://postgres:postgres@oic-model-postgis:5432/postgres",
     )
 
 settings = Settings()
