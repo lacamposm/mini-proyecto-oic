@@ -7,7 +7,7 @@ from enum import Enum
 
 from pydantic import BaseModel, Field
 
-from typing import Optional, Dict
+from typing import Optional, Dict, Union
 
 
 
@@ -57,30 +57,21 @@ class UbicacionEnum(str, Enum):
     oeste = "Oeste"
 
 
-class PredictRequest(BaseModel):
-    """
-    Modelo de solicitud para realizar una predicción de valor de venta.
-
-    Este modelo representa las características que el modelo de regresión necesita
-    para estimar el valor de una propiedad.
-
-    :param metros_cuadrados: Área construida en metros cuadrados. Debe ser mayor que 0.
-    :type metros_cuadrados: float
-    :param num_habitaciones: Número de habitaciones. Debe ser 0 o más.
-    :type num_habitaciones: float
-    :param ubicacion: Ubicación de la propiedad, debe ser una de las opciones válidas definidas en :class:`UbicacionEnum`.
-    :type ubicacion: UbicacionEnum
-    """
-    metros_cuadrados: float = Field(..., gt=0, description="Área en metros cuadrados")
-    num_habitaciones: float = Field(..., ge=0, description="Número de habitaciones")
-    ubicacion: UbicacionEnum = Field(..., description="Zona de la cuidad")
-
-
-class PredictResponse(BaseModel):
-    """
-    Modelo de respuesta que representa el valor predicho por el modelo.
-
-    :param prediction: Valor estimado de venta para la propiedad ingresada.
-    :type prediction: float
-    """
-    prediction: float = Field(..., description="Valor de venta predicho")
+class HousePredictionRequest(BaseModel):
+    user_name: str
+    bedrooms: Optional[int] = None
+    bathrooms: Optional[float] = None
+    sqft_living: Optional[int] = None
+    sqft_lot: Optional[int] = None
+    floors: Optional[float] = None
+    waterfront: Optional[str] = None   # ahora como cadena
+    view: Optional[str] = None         # ahora como cadena
+    condition: Optional[int] = None
+    grade: Optional[int] = None
+    sqft_above: Optional[int] = None
+    sqft_basement: Optional[int] = None
+    zipcode: Optional[str] = None      # ahora como cadena
+    lat: Optional[float] = None
+    long: Optional[float] = None
+    renovated: Optional[int] = None
+    lat_squared: Optional[float] = None

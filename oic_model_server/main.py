@@ -32,13 +32,14 @@ async def lifespan(app: FastAPI):
     SQLModel.metadata.create_all(bind=engine)
 
     try:
-        load_house_raw_data_to_db("kc_house_data.csv")
-        load_geo_house_raw_data_to_db()
+        load_house_raw_data_to_db("artifacts/kc_house_data.csv")
+        
     except Exception as e:
             print(f"❌ Error al cargar datos desde el CSV o al generar la GeoData: {e}")
             
     try:
         load_geo_house_raw_data_to_db()
+        
     except Exception as e:
             print(f"❌ Error al cargar datos Geograficos: {e}")
 

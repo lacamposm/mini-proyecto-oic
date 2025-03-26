@@ -36,8 +36,8 @@ services:
     ports:
       - "8000:8000"
     volumes:
+      - ./artifacts:/mini-proyecto-oic/artifacts
       - ./oic_model_server:/mini-proyecto-oic/oic_model_server
-      - ./data/kc_house_data.csv:/mini-proyecto-oic/kc_house_data.csv
     networks:
       - oic_service_network
     command: >
