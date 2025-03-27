@@ -5,6 +5,8 @@ from sqlmodel import SQLModel, Field as SQLModelField
 
 from sqlalchemy import BigInteger, Column
 
+from geoalchemy2 import Geometry
+
   
 
 class HouseRawDataTable(SQLModel, table=True):
@@ -63,3 +65,17 @@ class HouseRawDataTable(SQLModel, table=True):
     long: Optional[float] = SQLModelField(default=None, nullable=True)    
     sqft_living15: Optional[int] = SQLModelField(default=None, nullable=True)
     sqft_lot15: Optional[int] = SQLModelField(default=None, nullable=True)
+
+
+class HouseRawGeoData(SQLModel, table=True):
+    """
+    Tabla para almacenar únicamente el identificador y la geometría (como POINT) de cada propiedad.
+    Esta tabla se usará para operaciones geoespaciales y modelos ML que requieran información geográfica.
+    """
+    __tablename__ = "geo_houses_raw_data"
+    
+    id: Optional[int] = SQLModelField(
+        default=None, 
+        sa_column=Column(BigInteger, primary_key=True)
+    ) 
+    geometry: Optional[str] = SQLModelField(sa_column=Column(Geometry(geometry_type='POINT', srid=4326)))

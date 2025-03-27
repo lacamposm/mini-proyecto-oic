@@ -35,27 +35,14 @@ def get_postgres_engine():
     return create_engine(DATABASE_URL)
 
 
-def load_or_create_geo_data():
+def get_geo_df_houses_data():
     """
-    Crea o carga la geo data de houses_raw_data.
-    
-    :return:  GeoDataFrame con la columna `id` y `geometry`.
     """
-    shp_path = Path("data/geo/kc_houses_geo.shp")
-    
-    if shp_path.exists():
-        gdf = gpd.read_file(str(shp_path))
-    else:
-        engine = get_postgres_engine()
-        query = "SELECT * FROM houses_raw_data;"
-        df_kc_houses = pd.read_sql(query, engine)
-        geometry = [Point(xy) for xy in zip(df_kc_houses["long"], df_kc_houses["lat"])]
-        gdf = gpd.GeoDataFrame(df_kc_houses, geometry=geometry, crs="EPSG:4326")[["id", "geometry"]]
-        
-        shp_path.parent.mkdir(parents=True, exist_ok=True)
-        gdf.to_file(str(shp_path))
-            
-    return gdf
+    engine = get_postgres_engine()
+    query = "SELECT id, geometry FROM geo_houses_raw_data;"
+
+    return gpd.read_postgis(query, engine, geom_col="geometry")
+
 
 
 def get_df_houses_data():

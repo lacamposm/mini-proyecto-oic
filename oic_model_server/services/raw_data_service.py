@@ -3,9 +3,13 @@ import os
 
 import csv
 
+import pandas as pd
+
+from shapely.geometry import Point
+
 from oic_model_server.core.database import engine
 
-from oic_model_server.models.raw_data import HouseRawDataTable
+from oic_model_server.models.raw_data import HouseRawDataTable,HouseRawGeoData
 
 from sqlmodel import Session, select
 
@@ -69,3 +73,44 @@ def load_house_raw_data_to_db(csv_path: str):
             session.commit()
 
     print(f"✅ Proceso completado: Se insertaron {insert_count} registros nuevos en la tabla `houses_raw_data`.")
+
+
+def load_geo_house_raw_data_to_db():
+    """
+    Actualiza la tabla geo_houses_raw_data en la base de datos a partir de los datos
+    de houses_raw_data. Se extraen los campos `id`, `lat` y `long`, se genera la geometría
+    en formato WKT con SRID=4326 y se inserta (o actualiza) cada registro en la tabla geográfica.
+    Solo se contará como "nuevo" el registro si no existe previamente.
+    """
+    print("📥 Actualizando la tabla geo_houses_raw_data...")
+    
+    query = "SELECT id, lat, long FROM houses_raw_data;"
+    df = pd.read_sql(query, engine)
+    
+    df["geometry"] = df.apply(
+        lambda row: f"SRID=4326;{Point(row['long'], row['lat']).wkt}", axis=1
+    )
+    
+    new_count = 0
+    update_count = 0
+    with Session(engine) as session:
+        for _, row in df.iterrows():
+            
+            existing = session.exec(
+                select(HouseRawGeoData).where(HouseRawGeoData.id == row["id"])
+            ).first()
+            if existing is None:
+                
+                geo_record = HouseRawGeoData(id=row["id"], geometry=row["geometry"])
+                session.add(geo_record)
+                new_count += 1
+            else:
+                if existing.geometry != row["geometry"]:
+                    existing.geometry = row["geometry"]
+                    session.add(existing)
+                    update_count += 1
+        session.commit()
+    
+    print(f"✅ La tabla geo_houses_raw_data ha sido actualizada. Registros nuevos insertados: {new_count}. Registros actualizados: {update_count}")
+
+

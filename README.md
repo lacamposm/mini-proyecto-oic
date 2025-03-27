@@ -282,7 +282,7 @@ Una vez que el contenedor esté en ejecución, podrás acceder al IDE en:
 ### 2. Iniciar solo el servicio de PostgreSQL
 
 ```sh
-docker-compose -p oic-api-service up oic-model-postgres
+docker-compose -p oic-api-service up oic-model-postgis
 ```
 
 Este comando:
@@ -294,7 +294,7 @@ Este comando:
 Una vez inicializado el servicio de PostgreSQL, puedes conectarte a él usando:
 
 ```sh
-docker exec -it oic-model-postgres psql -U postgres -d postgres
+docker exec -it oic-model-postgis psql -U postgres -d postgres
 ```
 
 
