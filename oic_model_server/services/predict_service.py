@@ -3,7 +3,11 @@ import pandas as pd
 
 import pickle
 
-from sqlmodel import Session
+import numpy as np
+
+from typing import List
+
+from sqlmodel import Session, select
 
 from oic_model_server.models.predict import HousePredictionRequest, PredictTable
 
@@ -12,11 +16,10 @@ class PredictionService:
     """
     Servicio para realizar predicciones de precio de casas.
 
-    Este servicio carga un pipeline entrenado (incluyendo el preprocesamiento y el modelo)
-    desde un archivo pickle y lo utiliza para predecir el precio (en logaritmo) a partir
-    de las características proporcionadas en una solicitud. Además, guarda el registro de
-    la predicción en la base de datos.
-
+    Este servicio carga el pipeline entrenado (que incluye el preprocesamiento, como la transformación para
+    agregar 'lat_squared') desde un archivo pickle y lo utiliza para predecir el logaritmo del precio de la propiedad.
+    Además, registra la predicción en la base de datos.
+    
     :param model_path: Ruta al archivo pickle que contiene el pipeline entrenado.
     :type model_path: str
     :param db: Sesión de SQLModel para interactuar con la base de datos.
@@ -32,36 +35,67 @@ class PredictionService:
 
     def predict(self, data: HousePredictionRequest) -> float:
         """
-        Realiza la predicción del precio (log_price) de una casa a partir de las características
-        proporcionadas y registra el resultado en la base de datos.
+        Realiza la predicción del precio del predio a partir de las características proporcionadas.
+        
+        \f        
 
-        :param data: Solicitud con las características de la casa para la predicción.
+        :param data: Datos de entrada para la predicción.
         :type data: HousePredictionRequest
-        :return: Valor predicho (log_price) como número de punto flotante.
+        :return: Valor predicho como número flotante.
         :rtype: float
 
-        :raises Exception: Si ocurre un error durante la predicción o al guardar el registro en la base de datos.
-        """        
+        :raises Exception: Si ocurre un error durante la predicción o al registrar la predicción en la base de datos.
+        """
         features = data.model_dump()
         df_input = pd.DataFrame([features])
         
         try:
-            prediction = self.model.predict(df_input)
-            predicted_value = float(prediction[0])
+            
+            log_prediction = self.model.predict(df_input)
+            predicted = float(np.exp(float(log_prediction[0])))
+          
         except Exception as e:
             raise Exception(f"Error durante la predicción: {e}")
         
         try:
+            
             record = PredictTable(
                 user_name=data.user_name,
                 feature_data=data.model_dump(),
-                prediction=predicted_value
+                prediction=predicted
             )
             self.db.add(record)
             self.db.commit()
             self.db.refresh(record)
+            
         except Exception as e:
             self.db.rollback()
             raise Exception(f"Error al guardar la predicción en la base de datos: {e}")
-
-        return predicted_value
+        
+        return predicted
+    
+    
+    def get_predictions_by_user(self, user_name: str) -> List[PredictTable]:
+        """
+        Obtiene todas las predicciones realizadas por un usuario específico.
+        
+        Este método consulta la base de datos para recuperar todas las predicciones
+        asociadas con el nombre de usuario proporcionado, ordenadas por fecha de creación
+        de la más reciente a la más antigua.
+        
+        \f
+        
+        :param user_name: Nombre del usuario cuyas predicciones se desean obtener
+            
+        :return List[PredictTable]: Lista de registros de predicciones del usuario
+        """
+        try:
+            query = select(PredictTable).where(
+                PredictTable.user_name == user_name
+            ).order_by(PredictTable.created_at.desc())
+            
+            results = self.db.exec(query).all()
+            return results
+            
+        except Exception as e:
+            raise Exception(f"Error al obtener las predicciones del usuario: {e}")

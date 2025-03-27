@@ -1,56 +1,76 @@
 # model/regression_model.py
-import os
+import pickle
 
-import pandas as pd
+import numpy as np
 
-import geopandas as gpd
+from model.utils import get_df_houses_data, save_schema
 
-from pathlib import Path
+from sklearn.model_selection import train_test_split
 
-from dotenv import load_dotenv
+from sklearn.pipeline import Pipeline
 
-from shapely.geometry import Point
+from sklearn.compose import ColumnTransformer
 
-from sqlalchemy import create_engine
+from sklearn.preprocessing import OneHotEncoder
 
-load_dotenv()
+from sklearn.linear_model import LinearRegression
 
 
-def get_postgres_engine():
+
+def train_and_save_model():
     """
-    Crea y retorna una conexión (engine) a `PostgreSQL` usando `SQLAlchemy`.
-
-    :return: `SQLAlchemy` Engine conectado a `PostgreSQL`.
-    """
-    # user = os.getenv("POSTGRES_USER")
-    # password = os.getenv("POSTGRES_PASSWORD")
-    # host = os.getenv("POSTGRES_HOST")
-    # port = os.getenv("POSTGRES_PORT")
-    # database = os.getenv("POSTGRES_DB")
+    Entrena un modelo de regresión lineal para predecir precios de casas y guarda el modelo entrenado.
     
-    # DATABASE_URL = f"postgresql://{user}:{password}@{host}:{port}/{database}"
-
-    DATABASE_URL = os.getenv("DATABASE_URL")
+    Este proceso incluye:
+    1. Carga de datos desde PostgreSQL
+    2. Limpieza y preparación de datos (eliminación de columnas, manejo de duplicados)
+    3. Feature engineering (creación de variables derivadas)
+    4. Transformación de variables categóricas
+    5. Entrenamiento de un modelo de regresión lineal
+    6. Evaluación del rendimiento del modelo
+    7. Persistencia del esquema de datos y del modelo entrenado
     
-    return create_engine(DATABASE_URL)
-
-
-def get_geo_df_houses_data():
+    Los precios son transformados a escala logarítmica para mejorar la distribución.
+    
+    Outputs:
+    - Imprime métricas R² en conjuntos de entrenamiento y prueba
+    - Guarda el esquema de datos en "artifacts/input_schema_predict_v0.1.0.json"
+    - Guarda el modelo entrenado en "artifacts/modelo_lineal_v0.1.0.pkl"
     """
-    """
-    engine = get_postgres_engine()
-    query = "SELECT id, geometry FROM geo_houses_raw_data;"
+    df_kc_houses = get_df_houses_data()
+    df_kc_houses.drop(columns=["id", "sqft_living15", "sqft_lot15"], inplace=True, errors="coerce")
+    df_kc_houses.drop_duplicates(inplace=True)
+    df_kc_houses["renovated"] = df_kc_houses["yr_renovated"].apply(lambda x: 1 if x > 0 else 0)
+    df_kc_houses["log_price"] = np.log(df_kc_houses["price"])
+    df_kc_houses[["waterfront", "zipcode", "view"]] = df_kc_houses[["waterfront", "zipcode", "view"]].astype(str)
+    df_kc_houses.drop(columns=["date", "yr_renovated", "price", "yr_built"], inplace=True, errors="coerce")
 
-    return gpd.read_postgis(query, engine, geom_col="geometry")
+    X = df_kc_houses.drop(columns=["log_price"])
+    y = df_kc_houses["log_price"]
+
+    cat_cols = X.select_dtypes(include="object").columns.tolist()
+    
+    X = df_kc_houses.drop(columns=["log_price"])
+    y = df_kc_houses["log_price"]
 
 
+    preprocessor = ColumnTransformer([
+        ("cat", OneHotEncoder(drop="first", sparse_output=False), cat_cols),
+        ],remainder="passthrough")
 
-def get_df_houses_data():
-    """
-    Obtiene los datos de houses_raw_data desde la base de datos.
+    pipeline = Pipeline(steps=[
+        ("preprocessor", preprocessor),
+        ("regressor", LinearRegression()),
+    ])
 
-    :return: pd.DataFrame con los registros de houses_raw_data.
-    """
-    engine = get_postgres_engine()
-    query = "SELECT * FROM houses_raw_data;"
-    return pd.read_sql(query, engine)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+
+    pipeline.fit(X_train, y_train)
+    
+    print("R2 Train:", pipeline.score(X_train, y_train))
+    print("R2 Test: ", pipeline.score(X_test, y_test))
+    
+    save_schema(X_train, "artifacts/input_schema_predict_v0.1.0.json")
+    
+    with open("artifacts/modelo_lineal_v0.1.0.pkl", "wb") as f:
+        pickle.dump(pipeline, f)
