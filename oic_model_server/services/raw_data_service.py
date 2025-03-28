@@ -64,6 +64,14 @@ def load_house_raw_data_to_db(csv_path: str):
                 try:
                     house_id = int(row.get("id"))
                     
+                    existing = session.exec(
+                        select(HouseRawDataTable.id).where(HouseRawDataTable.id == house_id)
+                    ).first()
+                    
+                    if existing:
+                        print(f"id de la casa repetido: {house_id}")
+                        continue
+                    
                     if house_id in ids_to_insert:
 
                         house_data = HouseRawDataTable(

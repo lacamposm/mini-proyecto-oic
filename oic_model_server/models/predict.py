@@ -1,7 +1,7 @@
 # oic_model_server/models/prediction.py
 from sqlmodel import SQLModel, Field as SQLModelField
 
-from sqlalchemy import Column, JSON
+from sqlalchemy import ForeignKey, Column, JSON
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -13,34 +13,42 @@ from datetime import datetime
 class PredictTable(SQLModel, table=True):
     """
     Representa un registro de predicción en la base de datos.
-
+    
     Esta clase define la estructura para almacenar los datos de una predicción,
-    incluyendo la información de las características en formato JSON, el valor predicho y el usuario
-    asociado (mediante su nombre de usuario).
-
-    :param id_predict: Identificador único de la predicción.
-    :type id_predict: Optional[int]
-    :param user_name: Nombre de usuario asociado a la predicción. Es una llave foránea que hace referencia
-                      a ``users.user_name``.
-    :type user_name: str
-    :param feature_data: Datos de las características en formato JSON. Aquí se guarda toda la información
-                         que ingresa el usuario.
-    :type feature_data: Dict
-    :param prediction: Valor predicho.
-    :type prediction: float
+    incluyendo la información de las características en formato JSON, 
+    el valor predicho y el usuario asociado.
     """
     __tablename__ = "predictions"
-
-    predict_id: Optional[int] = SQLModelField(default=None, primary_key=True)
-    user_name: str = SQLModelField(foreign_key="users.user_name")
-    feature_data: Dict = SQLModelField(..., sa_column=Column(JSON))
-    prediction: float = SQLModelField(...)
-    created_at: datetime = SQLModelField(default_factory=datetime.now)
+    
+    predict_id: Optional[int] = SQLModelField(
+        default=None, 
+        primary_key=True
+    )
+    
+    user_name: str = SQLModelField(
+        sa_column=Column(
+            ForeignKey(
+                "users.user_name", 
+                onupdate="CASCADE",
+                ondelete="CASCADE",
+            )
+        )
+    )
+    
+    feature_data: Dict = SQLModelField(
+        sa_column=Column(JSON)
+    )
+    
+    prediction: float = SQLModelField()
+    
+    created_at: datetime = SQLModelField(
+        default_factory=datetime.now
+    )
 
 
 class HousePredictionRequest(BaseModel):
     """
-    Modelo de datos para la solicitud de predicción de precio de una casa.
+    Modelo para la solicitud de predicción de precio de una inmueble.
     
     \f
     """
@@ -125,7 +133,7 @@ class PredictionResponse(BaseModel):
     Este modelo define la estructura de datos que se devuelve cuando se consultan
     las predicciones realizadas por un usuario específico.
     
-    \t   
+    \f  
     """
     predict_id: int
     user_name: str
