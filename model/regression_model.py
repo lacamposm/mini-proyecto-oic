@@ -22,20 +22,21 @@ def train_and_save_model():
     Entrena un modelo de regresión lineal para predecir precios de casas y guarda el modelo entrenado.
     
     Este proceso incluye:
-    1. Carga de datos desde PostgreSQL
-    2. Limpieza y preparación de datos (eliminación de columnas, manejo de duplicados)
-    3. Feature engineering (creación de variables derivadas)
-    4. Transformación de variables categóricas
-    5. Entrenamiento de un modelo de regresión lineal
-    6. Evaluación del rendimiento del modelo
-    7. Persistencia del esquema de datos y del modelo entrenado
+    
+        1. Carga de datos desde PostgreSQL
+        2. Limpieza y preparación de datos (eliminación de columnas, manejo de duplicados)
+        3. Feature engineering (creación de variables derivadas)
+        4. Transformación de variables categóricas
+        5. Entrenamiento de un modelo de regresión lineal
+        6. Evaluación del rendimiento del modelo
+        7. Persistencia del esquema de datos y del modelo entrenado
     
     Los precios son transformados a escala logarítmica para mejorar la distribución.
     
     Outputs:
-    - Imprime métricas R² en conjuntos de entrenamiento y prueba
-    - Guarda el esquema de datos en "artifacts/input_schema_predict_v0.1.0.json"
-    - Guarda el modelo entrenado en "artifacts/modelo_lineal_v0.1.0.pkl"
+        - Imprime métricas `R²` en conjuntos de entrenamiento y prueba
+        - Guarda el esquema de datos en: `artifacts/input_schema_predict_v0.1.0.json`
+        - Guarda el modelo entrenado en: `artifacts/modelo_lineal_v0.1.0.pkl`
     """
     df_kc_houses = get_df_houses_data()
     df_kc_houses.drop(columns=["id", "sqft_living15", "sqft_lot15"], inplace=True, errors="coerce")

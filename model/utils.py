@@ -23,6 +23,7 @@ def get_postgres_engine():
     completa a la base de datos PostgreSQL.
 
     :return: `SQLAlchemy` Engine conectado a `PostgreSQL`.
+    :rtype: sqlalchemy.engine.Engine
     """
     DATABASE_URL = os.getenv("DATABASE_URL")
     return create_engine(DATABASE_URL)
@@ -33,6 +34,7 @@ def get_df_houses_data():
     Obtiene los datos de houses_raw_data desde la base de datos `PostgreSQL`.
 
     :return: pd.DataFrame con los registros de houses_raw_data.
+    :rtype: pandas.DataFrame
     """
     engine = get_postgres_engine()
     query = "SELECT * FROM houses_raw_data;"
@@ -44,6 +46,7 @@ def get_geo_df_houses_data():
     Obtiene datos geoespaciales de casas.
     
     :return: GeoDataFrame con los datos geoespaciales de casas.
+    :rtype: geopandas.GeoDataFrame
     """
     engine = get_postgres_engine()
     query = "SELECT id, geometry FROM geo_houses_raw_data;"
@@ -53,7 +56,7 @@ def get_geo_df_houses_data():
 
 def save_schema(X, path):
     """
-    Guarda el esquema de datos de entrada en formato JSON con metadatos enriquecidos.
+    Guarda el esquema de datos de entrada en formato `JSON` con metadatos enriquecidos.
     
     Además de los tipos de datos, incluye:
     - Para variables categóricas: la lista de valores únicos posibles
@@ -63,7 +66,10 @@ def save_schema(X, path):
     adecuadamente, facilitando la detección de errores o valores fuera de rango.
     
     :param X: DataFrame de pandas cuyos metadatos se quieren guardar
-    :param path: Ruta del archivo donde se guardará el esquema JSON
+    :type X: pandas.DataFrame
+    :param path: Ruta del archivo donde se guardará el esquema `JSON`
+    :type path: str
+    :return: None
     """
     enriched_schema = {}
     

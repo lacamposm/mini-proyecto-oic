@@ -9,6 +9,18 @@ API_URL = "http://oic-model-api:8000"
 
 def run_user_management():
     """
+    Crea y muestra una interfaz para la gestión de usuarios en el sistema.
+    
+    Esta función genera una interfaz con pestañas que permite:
+    1. Crear nuevos usuarios en el sistema
+    2. Actualizar nombres de usuarios existentes
+    3. Eliminar usuarios y sus datos asociados
+    
+    Cada operación incluye validación de campos y manejo de errores para
+    proporcionar retroalimentación al usuario sobre el resultado de sus acciones.
+    
+    :return: None, los resultados se muestran directamente en la interfaz Streamlit
+    :rtype: None
     """
     st.header("Gestión de usuarios")
     

@@ -10,10 +10,30 @@ API_URL = "http://oic-model-api:8000"
 
 
 def format_price(price):
+    """
+    Formatea un valor numérico como un precio en formato monetario.
+    
+    :param price: El valor numérico a formatear
+    :type price: float
+    :return: String con formato de precio ($X,XXX.XX)
+    :rtype: str
+    """
     return f"${price:,.2f}"
 
 
 def run_history():
+    """
+    Muestra la interfaz de historial de predicciones y maneja la lógica para
+    consultar y mostrar predicciones previas por nombre de usuario.
+    
+    Esta función crea un componente Streamlit que:
+    1. Muestra un campo para ingresar el nombre de usuario
+    2. Realiza la consulta a la API al hacer clic en el botón
+    3. Muestra los resultados en una tabla formateada
+    
+    :return: None, los resultados se muestran directamente en la interfaz Streamlit
+    :rtype: None
+    """
     st.header("Historial de predicciones")
     
     username_for_history = st.text_input("👤 Nombre de usuario para consultar historial")

@@ -6,9 +6,29 @@ import requests
 API_URL = "http://oic-model-api:8000"
 
 def format_price(price):
+    """
+    Formatea un valor numérico como un precio en formato monetario.
+    
+    :param price: El valor numérico a formatear
+    :type price: float
+    :return: String con formato de precio ($X,XXX.XX)
+    :rtype: str
+    """
     return f"${price:,.2f}"
 
 def run_prediction():
+    """
+    Crea y muestra una interfaz para predecir precios de inmuebles.
+    
+    Esta función genera un formulario de Streamlit que:
+    1. Recolecta los datos del inmueble a través de controles interactivos (sliders, inputs)
+    2. Envía los datos al API para realizar la predicción
+    3. Muestra el resultado de la predicción con formato monetario
+    4. Presenta métricas clave que influyen en el precio
+    
+    :return: None, los resultados se muestran directamente en la interfaz Streamlit
+    :rtype: None
+    """
     st.header("Predice el precio de un inmueble.")
     
     with st.form("prediction_form"):

@@ -16,13 +16,12 @@ class PredictionService:
     """
     Servicio para realizar predicciones de precio de casas.
 
-    Este servicio carga el pipeline entrenado (que incluye el preprocesamiento, como la transformación para
-    agregar 'lat_squared') desde un archivo pickle y lo utiliza para predecir el logaritmo del precio de la propiedad.
+    Este servicio carga el pipeline entrenado desde un archivo `pickle` y lo utiliza para predecir el logaritmo del precio de la propiedad.
     Además, registra la predicción en la base de datos.
     
-    :param model_path: Ruta al archivo pickle que contiene el pipeline entrenado.
+    :param model_path: Ruta al archivo `pickle` que contiene el pipeline entrenado.
     :type model_path: str
-    :param db: Sesión de SQLModel para interactuar con la base de datos.
+    :param db: Sesión de `SQLModel` para interactuar con la base de datos.
     :type db: Session
     """
     def __init__(self, model_path: str, db: Session):

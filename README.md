@@ -8,12 +8,25 @@ Este repositorio contiene un modelo analítico basado en regresión lineal, inte
 
 ```plaintext
 mini-proyecto-oic/
-├── data/
+├── artifacts/
+│   └── input_schema_predict_v0.1.0.json
 │   └── kc_house_data.csv
+│   └── modelo_lineal_v0.1.0.pkl
+├── docs/
+│   ├── source/
+│   │   ├── config.py
+│   │   ├── index.rst
+│   │   ├── model.rst
+│   │   ├── modules.rst
+│   │   ├── oic_model_server.rst
+│   │   ├── streamlit_app.rst
+│   ├── make.bat
+│   └── Makefile
 ├── model/
 │   ├── __init__.py
-│   ├── modelo_regresion.pkl
-│   └── regression_model.py
+│   ├── regression_model.py
+│   └── run_training.py
+│   └── utils.py
 ├── oic_model_server/
 │   ├── api/
 │   │   ├── __init__.py
@@ -37,6 +50,14 @@ mini-proyecto-oic/
 │   │   └── user_service.py
 │   ├── __init__.py
 │   └── main.py
+├── streamlit_app/
+│   ├── __init__.py
+│   ├── components/
+│   │   ├── __init__.py
+│   │   └── history.py
+│   │   └── prediction.py
+│   │   └── user_managenebt.py
+│   └── app.py
 ├── Dockerfile
 ├── docker-compose.yml
 ├── environment.yml
@@ -207,20 +228,33 @@ Una vez iniciados los servicios, verifica que estén accesibles:
 
   ```sh
   curl -X 'POST' \
-  'http://0.0.0.0:8000/predict/?user_name=Francisco%20Belez' \
+  'http://localhost:8000/predict/predict' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
-  "metros_cuadrados": 1,
-  "num_habitaciones": 0,
-  "ubicacion": "Centro"
+  "bathrooms": 2.25,
+  "bedrooms": 3,
+  "condition": 3,
+  "floors": 2,
+  "grade": 8,
+  "lat": 47.6307,
+  "long": -122.0412,
+  "renovated": 0,
+  "sqft_above": 1800,
+  "sqft_basement": 0,
+  "sqft_living": 1800,
+  "sqft_lot": 7200,
+  "user_name": "juan_perez",
+  "view": "0",
+  "waterfront": "0",
+  "zipcode": "98052"
   }'
   ```
   La API responderá con:
 
     ```json
     {
-      "prediction": 250000.0
+      "prediction": 250000
     }
     ```
 
@@ -263,16 +297,16 @@ docker-compose down -v
 ## Servicios Independientes
 
 
-### 1. Iniciar solo el servicio de code-server
+### 1. Iniciar un servicio dev
 
 ```sh
-docker-compose -p oic-api-service up oic-codeserver
+docker-compose -p oic-api-service up oic-model-postgis oic-model-api oic-codeserver
 ```
 
 Este comando:
 
-- Inicia únicamente el servicio de code-server
-- Mantiene el nombre de proyecto consistente con el resto del stack
+- Inicia un servicio para desarrollar en el proyecto.
+- Mantiene el nombre de proyecto consistente con el resto del stack.
 - Es útil cuando necesitas desarrollar sobre el proyecto completo (API-MODEL-UI).
 
 Una vez que el contenedor esté en ejecución, podrás acceder al IDE en:

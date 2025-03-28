@@ -62,7 +62,7 @@ def create_application() -> FastAPI:
     app = FastAPI(
         title="Modelo Analitico OIC - API-SERVER",
         version="0.1.0",
-        description="API para predecir precios de casas, almacenar predicciones, etc.",
+        description="API para predecir precios de inmuebles con administracion de usuarios.",
         lifespan=lifespan
     )
 
