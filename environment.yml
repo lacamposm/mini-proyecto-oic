@@ -31,3 +31,5 @@ dependencies:
   - sphinx-rtd-theme
   - sphinx-autodoc-typehints
   - sphinx-copybutton
+  - pip:
+    - streamlit_folium

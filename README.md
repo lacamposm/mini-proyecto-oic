@@ -300,7 +300,7 @@ docker-compose down -v
 ### 1. Iniciar un servicio dev
 
 ```sh
-docker-compose -p oic-api-service up oic-model-postgis oic-model-api oic-codeserver
+docker-compose -p oic-dev up oic-model-postgis oic-model-api oic-codeserver
 ```
 
 Este comando:
@@ -316,7 +316,7 @@ Una vez que el contenedor esté en ejecución, podrás acceder al IDE en:
 ### 2. Iniciar solo el servicio de PostgreSQL
 
 ```sh
-docker-compose -p oic-api-service up oic-model-postgis
+docker-compose -p oic-postgis up oic-model-postgis
 ```
 
 Este comando:
@@ -328,7 +328,7 @@ Este comando:
 Una vez inicializado el servicio de PostgreSQL, puedes conectarte a él usando:
 
 ```sh
-docker exec -it oic-model-postgis psql -U postgres -d postgres
+docker exec -it oic-postgis psql -U postgres -d postgres
 ```
 
 

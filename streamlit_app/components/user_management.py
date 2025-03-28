@@ -1,6 +1,8 @@
 # streamlit_app/components/user_management.py
 import streamlit as st
 
+import pandas as pd
+
 import requests
 
 
@@ -42,7 +44,8 @@ def run_user_management():
                     if response.status_code == 200:
                         user_data = response.json()
                         st.success("✅ Usuario creado exitosamente!")
-                        st.json(user_data)
+                        st.subheader("📋 Tus detalles.\nNo olvides conservarlos estos datos en un lugar seguro.")
+                        st.dataframe(pd.DataFrame([user_data]))
                     else:
                         st.error(f"❌ Error al crear usuario: {response.text}")
                 except Exception as e:
