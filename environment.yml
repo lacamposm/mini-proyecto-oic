@@ -27,3 +27,7 @@ dependencies:
   - joblib
   - python-multipart
   - geoalchemy2
+  - sphinx
+  - sphinx-rtd-theme
+  - sphinx-autodoc-typehints
+  - sphinx-copybutton
