@@ -1,0 +1,71 @@
+services:
+  oic-model-postgis:
+    image: postgis/postgis:15-3.5
+    container_name: oic-model-postgis
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - oic-db-model-service:/var/lib/postgresql/data
+    networks:
+      - oic_service_network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  oic-model-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    image: oic-model-service
+    container_name: oic-model-api
+    depends_on:
+      oic-model-postgis:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    ports:
+      - "8000:8000"
+    networks:
+      - oic_service_network
+    command: >
+      sh -c "conda run -n oic-model-server gunicorn oic_model_server.main:app
+      -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 --timeout 120"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  oic-ui-service:
+    image: oic-model-service  # misma imagen con Streamlit incluido
+    container_name: oic-ui-service
+    depends_on:
+      oic-model-api:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      PYTHONUNBUFFERED: "1"
+    ports:
+      - "8501:8501"
+    networks:
+      - oic_service_network
+    command: >
+      sh -c "conda run -n oic-model-server streamlit run streamlit_app/app.py --server.port=8501 --server.address=0.0.0.0"
+
+volumes:
+  oic-db-model-service:
+
+networks:
+  oic_service_network:
+    driver: bridge
