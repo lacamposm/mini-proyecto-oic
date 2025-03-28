@@ -3,6 +3,8 @@ import uuid
 
 from datetime import datetime
 
+from typing import Optional
+
 from sqlmodel import SQLModel, Field as SQLModelField
 
 from pydantic import BaseModel, Field
@@ -48,32 +50,43 @@ class UserTable(SQLModel, table=True):
 class UserCreate(BaseModel):
     """
     Modelo Pydantic para la creación (inscripción) de un usuario.
-
+    
     Este modelo se utiliza para validar los datos de entrada al registrar un nuevo usuario.
-    Se requiere únicamente el campo ``user_name``, ya que el identificador y las marcas de
+    Se requiere únicamente el campo `user_name`, ya que el identificador y las marcas de
     tiempo se generan internamente en el servidor.
-
-    :param user_name: Nombre de usuario único.
-    :type user_name: str
     """
     user_name: str = Field(..., description="Nombre de usuario único.")
+    
 
 class UserRead(BaseModel):
     """
     Modelo Pydantic para la lectura de datos del usuario.
 
     Este modelo se utiliza para serializar la información del usuario que se devuelve al cliente.
-    Se exponen únicamente los campos ``user_id`` y ``user_name`` para mantener interna la
+    Se exponen únicamente los campos `user_id` y `user_name` para mantener interna la
     información de las marcas de tiempo.
-
-    :param user_id: Identificador interno único.
-    :type user_id: str
-    :param user_name: Nombre de usuario único.
-    :type user_name: str
     """
     user_id: str = Field(..., description="Identificador interno único")
     user_name: str = Field(..., description="Nombre de usuario único")
 
     model_config = {
         "from_attributes": True
+    }
+    
+    
+class UserUpdate(BaseModel):
+    """
+    Modelo Pydantic para la actualización de datos de usuario.
+    
+    Este modelo se utiliza para validar los datos de entrada al actualizar
+    la información de un usuario existente.
+    """
+    user_name: Optional[str] = Field(None, description="Nuevo nombre de usuario")
+    
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "user_name": "nuevo_nombre_usuario"
+            }
+        }
     }

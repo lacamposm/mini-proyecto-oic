@@ -172,6 +172,8 @@ cython_debug/
 
 # VS-Code settings
 .vscode/
+# dev containers
+.devcontainer/
 
 # Notebooks
 notebooks/
