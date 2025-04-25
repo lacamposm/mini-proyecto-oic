@@ -34,6 +34,9 @@ services:
       DATABASE_URL: ${DATABASE_URL}
     ports:
       - "8000:8000"
+    volumes:
+      - ./artifacts:/mini-proyecto-oic/artifacts
+      - ./oic_model_server:/mini-proyecto-oic/oic_model_server
     networks:
       - oic_service_network
     command: >
@@ -58,10 +61,12 @@ services:
       PYTHONUNBUFFERED: "1"
     ports:
       - "8501:8501"
+    volumes:
+      - ./streamlit_app:/mini-proyecto-oic/streamlit_app
     networks:
       - oic_service_network
     command: >
-      sh -c "conda run -n oic-model-server streamlit run streamlit_app/app.py --server.port=8501 --server.address=0.0.0.0"
+      sh -c "conda run --live-stream -n oic-model-server streamlit run streamlit_app/app.py --server.port 8501"
 
 volumes:
   oic-db-model-service:
