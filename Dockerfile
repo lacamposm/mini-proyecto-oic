@@ -1,5 +1,5 @@
 # Imagen base con Conda, VSCode, y utilidades
-FROM lacamposm/docker-helpers:conda-vscode
+FROM lacamposm/docker-helpers:python-conda-base-latest
 
 # Crear carpeta del proyecto
 WORKDIR /mini-proyecto-oic
@@ -10,7 +10,7 @@ RUN apt-get update && \
     apt-get clean
 
 # Copiar environment.yml y crear entorno conda
-COPY environment.prod.yml /tmp/environment.yml
+COPY environment.yml /tmp/environment.yml
 RUN conda env create -f /tmp/environment.yml && rm /tmp/environment.yml
 
 # Copiar código del backend (API), frontend (UI), y artifacts

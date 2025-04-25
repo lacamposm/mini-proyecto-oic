@@ -22,7 +22,7 @@ services:
   oic-model-api:
     build:
       context: .
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile
     image: oic-model-service
     container_name: oic-model-api
     depends_on:
@@ -47,7 +47,7 @@ services:
       start_period: 10s
 
   oic-ui-service:
-    image: oic-model-service  # misma imagen con Streamlit incluido
+    image: oic-model-service
     container_name: oic-ui-service
     depends_on:
       oic-model-api:
