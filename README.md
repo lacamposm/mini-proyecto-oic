@@ -9,6 +9,8 @@ Este repositorio contiene un sistema completo de predicción basado en regresió
 ```plaintext
 mini-proyecto-oic/
 ├── .devcontainer/
+│   ├── Dockerfile.dev
+│   ├── docker-compose-dev.yml
 │   └── devcontainer.json
 ├── artifacts/
 │   ├── input_schema_predict_v0.1.0.json
@@ -300,7 +302,20 @@ Este proyecto incluye configuración para desarrollo usando VS Code Dev Containe
 
 VS Code construirá y configurará automáticamente el contenedor según las especificaciones en `.devcontainer/devcontainer.json`, y luego abrirá la ventana conectada al contenedor.
 
-**¡IMPORTANTE!** Al abrir el proyecto en un Dev Container, te conectarás al servicio `oic-model-api` definido en el `docker-compose.yml`. El contenedor ya incluirá todas las herramientas necesarias para el desarrollo.
+El proyecto ofrece dos opciones para trabajar con Dev Containers:
+
+#### Entorno de Desarrollo Optimizado (Recomendado)
+
+El entorno de desarrollo utiliza un Dockerfile y docker-compose dedicados ubicados en el directorio `.devcontainer/`:
+
+- `Dockerfile.dev`: Configurado específicamente para desarrollo
+- `docker-compose-dev.yml`: Configuración separada de Docker Compose para desarrollo
+- Usuario no-root (`dev-user`) para mayor seguridad
+- Volúmenes configurados para sincronizar todos los cambios entre host y contenedor
+
+Esta opción está configurada por defecto en el archivo `devcontainer.json`.
+
+**¡IMPORTANTE!** Al abrir el proyecto en un Dev Container, te conectarás al servicio `oic-model-api`. El contenedor ya incluirá todas las herramientas necesarias para el desarrollo.
 
 ### 3. Beneficios del Dev Container
 
@@ -310,6 +325,7 @@ VS Code construirá y configurará automáticamente el contenedor según las esp
 - Extensiones de VS Code preconfiguradas (Python, Pylance, Git, etc.)
 - Formateo automático con Black configurado
 - Linting con Pylint habilitado
+- Sincronización bidireccional de archivos entre el host y el contenedor
 
 ### 4. Puertos Disponibles
 
@@ -319,8 +335,6 @@ Los siguientes puertos están configurados para reenvío automático:
 - 8000: API FastAPI
 - 8501: Interfaz Streamlit
 - 5678: Puerto para depuración remota (Python)
-
-
 
 ---
 
