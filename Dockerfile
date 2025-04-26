@@ -1,19 +1,26 @@
-# Visita: https://hub.docker.com/r/lacamposm/docker-helpers/tags
-# Para ver mas imagenes base disponibles.
-FROM lacamposm/docker-helpers:conda-vscode
+# Imagen base con Conda, VSCode, y utilidades
+FROM lacamposm/docker-helpers:python-conda-base-latest
 
+# Crear carpeta del proyecto
 WORKDIR /mini-proyecto-oic
 
-# Herramientas para paquetes adicionales (PostgreSQL)
+# Instalar dependencias del sistema necesarias (p. ej. para psycopg2 o compilar extensiones)
 RUN apt-get update && \
-    apt-get install -y build-essential postgresql-client
+    apt-get install -y build-essential postgresql-client && \
+    apt-get clean
 
+# Copiar environment.yml y crear entorno conda
 COPY environment.yml /tmp/environment.yml
 RUN conda env create -f /tmp/environment.yml && rm /tmp/environment.yml
+
+# Copiar código del backend (API), frontend (UI), y artifacts
+COPY ./oic_model_server /mini-proyecto-oic/oic_model_server
+COPY ./streamlit_app /mini-proyecto-oic/streamlit_app
+COPY ./artifacts /mini-proyecto-oic/artifacts
 
 # Activación automática del entorno conda
 RUN echo 'eval "$(conda shell.bash hook)"' >> ~/.bashrc && \
     echo 'conda activate oic-model-server' >> ~/.bashrc
 
-# Puerto para streamlit, uvicorn y code-server
-EXPOSE 8501 8000 8080
+# Exponer puertos para API y Streamlit
+EXPOSE 8000 8501

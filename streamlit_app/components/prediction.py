@@ -133,3 +133,4 @@ def run_prediction():
                             )
                 except Exception as e:
                     st.error(f"❌ Error de conexión: {e}")
+                    
