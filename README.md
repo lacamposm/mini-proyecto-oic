@@ -1,6 +1,6 @@
-# 🧠 OIC Model Service — Sistema de Predicción de precios de inmuebles
+# 🧠 OIC Model Service — Sistema de Predicción de Precios de Inmuebles
 
-Este repositorio contiene un sistema completo de predicción basado en regresión lineal, que expone una **API RESTful** con [FastAPI](https://fastapi.tiangolo.com/), una **interfaz web** en [Streamlit](https://streamlit.io/) y una **base de datos PostgreSQL**, todo completamente **dockerizado y preparado para desarrollo**.
+Este repositorio contiene un sistema completo de predicción basado en regresión lineal, que expone una **API RESTful** con [FastAPI](https://fastapi.tiangolo.com/), una **interfaz web** en [Streamlit](https://streamlit.io/) y una **base de datos PostgreSQL/PostGIS**, todo completamente **dockerizado y preparado para desarrollo**.
 
 ---
 
@@ -11,59 +11,60 @@ mini-proyecto-oic/
 ├── .devcontainer/
 │   └── devcontainer.json
 ├── artifacts/
-│   └── input_schema_predict_v0.1.0.json
-│   └── kc_house_data.csv
+│   ├── input_schema_predict_v0.1.0.json
+│   ├── kc_house_data.csv
 │   └── modelo_lineal_v0.1.0.pkl
 ├── docs/
 │   ├── source/
-│   │   ├── config.py
+│   │   ├── conf.py
 │   │   ├── index.rst
 │   │   ├── model.rst
 │   │   ├── modules.rst
 │   │   ├── oic_model_server.rst
 │   │   ├── streamlit_app.rst
+│   │   └── _static/
+│   │       ├── logo_OIC_blue.png
+│   │       └── logo_python.jpg
 │   ├── make.bat
 │   └── Makefile
 ├── model/
-│   ├── __init__.py
 │   ├── regression_model.py
-│   └── run_training.py
+│   ├── run_training.py
 │   └── utils.py
 ├── oic_model_server/
 │   ├── api/
-│   │   ├── __init__.py
-│   │   └── routes/
-│   │       ├── __init__.py
-│   │       ├── predict.py
-│   │       └── user.py
+│   │   ├── routes/
+│   │   │   ├── predict.py
+│   │   │   ├── user.py
+│   │   │   └── __init__.py
+│   │   └── __init__.py
 │   ├── core/
-│   │   ├── __init__.py
 │   │   ├── config.py
 │   │   ├── database.py
+│   │   └── __init__.py
 │   ├── models/
-│   │   ├── __init__.py
 │   │   ├── predict.py
 │   │   ├── raw_data.py
-│   │   └── user.py
+│   │   ├── user.py
+│   │   └── __init__.py
 │   ├── services/
-│   │   ├── __init__.py
 │   │   ├── predict_service.py
 │   │   ├── raw_data_service.py
-│   │   └── user_service.py
-│   ├── __init__.py
-│   └── main.py
+│   │   ├── user_service.py
+│   │   └── __init__.py
+│   ├── main.py
+│   └── __init__.py
 ├── streamlit_app/
-│   ├── __init__.py
 │   ├── components/
-│   │   ├── __init__.py
-│   │   └── history.py
-│   │   └── prediction.py
-│   │   └── user_managenebt.py
-│   └── app.py
+│   │   ├── history.py
+│   │   ├── prediction.py
+│   │   ├── user_management.py
+│   │   └── __init__.py
+│   ├── app.py
+│   └── __init__.py
 ├── Dockerfile
 ├── docker-compose.yml
 ├── environment.yml
-├── streamlit_app.py
 └── README.md
 ```
 
@@ -91,7 +92,7 @@ docker build -t oic-model-service .
 Si la construcción fue exitosa, verás la imagen creada en tu lista de imágenes Docker:
 
 ```sh
-docker images
+docker images | grep oic-model-service
 ```
 
 ### 2. Opciones para Ejecutar los Contenedores
@@ -114,7 +115,7 @@ conda env list
 
 Para desarrollar mientras los cambios se reflejan en tiempo real:
 
-- Linux:
+- Linux/macOS:
 
     ```sh
     docker run -it --rm -v "$(pwd)":/$(basename "$(pwd)") -w /$(basename "$(pwd)") oic-model-service /bin/bash
@@ -145,9 +146,20 @@ Después de haber construido y probado la imagen Docker, podemos proceder a leva
 
 ---
 
-### 1. Configuración de `docker-compose.yml`
+### 1. Configuración de Variables de Entorno
 
-Revisa el archivo `docker-compose.yml` ademas no olvides crear el archivo `.env` en la raiz del proyecto siguiendo el template en `.env.example`
+Antes de iniciar los servicios, crea un archivo `.env` en la raíz del proyecto siguiendo el template en `.env.example`:
+
+```sh
+# Copiar el archivo de ejemplo y configurar según necesidad
+cp .env.example .env
+```
+
+Edita el archivo `.env` para establecer las variables de entorno necesarias, como la URL de la base de datos:
+
+```
+DATABASE_URL=postgresql://postgres:postgres@oic-model-postgis:5432/postgres
+```
 
 ### 2. Construcción y Levantamiento de Servicios
 
@@ -194,7 +206,7 @@ Este proceso:
   docker-compose ps
   ```
 
-### 3. Verificación de Servicios Completos.
+### 3. Verificación de Servicios
 
 Una vez iniciados los servicios, verifica que estén accesibles:
 
@@ -227,18 +239,25 @@ Una vez iniciados los servicios, verifica que estén accesibles:
   "zipcode": "98052"
   }'
   ```
-  La API responderá con:
+  
+  La API responderá con una predicción similar a:
 
-    ```json
-    {
-      "prediction": 250000
-    }
-    ```
+  ```json
+  {
+    "prediction": 250000
+  }
+  ```
 
 - **Streamlit (Interfaz Gráfica):**  
   [http://localhost:8501](http://localhost:8501)
 
-   La interfaz de usuario te permitirá ingresar valores y recibir predicciones en tiempo real.
+  La interfaz de usuario te permitirá ingresar valores y recibir predicciones en tiempo real.
+
+- **Base de Datos PostgreSQL/PostGIS:**
+  - Puerto: 5433 (mapeado desde 5432 del contenedor)
+  - Usuario: postgres
+  - Contraseña: postgres
+  - Base de datos: postgres
 
 ### 4. Administración de Contenedores
 
@@ -254,7 +273,7 @@ Para detener los servicios:
 docker-compose down
 ```
 
-Para detener los servicios y eliminar volúmenes:
+Para detener los servicios y eliminar volúmenes (¡cuidado! esto eliminará todos los datos almacenados):
 
 ```sh
 docker-compose down -v
@@ -281,34 +300,33 @@ Este proyecto incluye configuración para desarrollo usando VS Code Dev Containe
 
 VS Code construirá y configurará automáticamente el contenedor según las especificaciones en `.devcontainer/devcontainer.json`, y luego abrirá la ventana conectada al contenedor.
 
-**¡IMPORTANTE!** Al abrir el proyecto en un Dev Container, **la API se inicia automáticamente** por la configuración en `.devcontainer/devcontainer.json` que especifica `"runServices": ["oic-model-api"]`. No necesitas iniciarla manualmente, ya estará disponible en http://localhost:8000.
+**¡IMPORTANTE!** Al abrir el proyecto en un Dev Container, te conectarás al servicio `oic-model-api` definido en el `docker-compose.yml`. El contenedor ya incluirá todas las herramientas necesarias para el desarrollo.
 
 ### 3. Beneficios del Dev Container
 
 - Entorno de desarrollo consistente en cualquier máquina
-- Todas las dependencias preinstaladas
-- API levantada automáticamente y lista para usar
+- Todas las dependencias preinstaladas (Python, Conda, PostgreSQL client, etc.)
 - Acceso directo a la base de datos y servicios definidos en `docker-compose.yml`
-- Extensiones de VS Code preconfiguradas
+- Extensiones de VS Code preconfiguradas (Python, Pylance, Git, etc.)
+- Formateo automático con Black configurado
+- Linting con Pylint habilitado
 
-### 4. Ejecutar Streamlit desde el Dev Container
+### 4. Puertos Disponibles
 
-Una vez dentro del contenedor de desarrollo, la API ya está en funcionamiento. Para iniciar la interfaz Streamlit:
+Los siguientes puertos están configurados para reenvío automático:
+- 5432: PostgreSQL dentro del contenedor
+- 5433: PostgreSQL mapeado al host
+- 8000: API FastAPI
+- 8501: Interfaz Streamlit
+- 5678: Puerto para depuración remota (Python)
 
-```bash
-# Para iniciar Streamlit (se ejecutará automáticamente en el puerto 8502)
-streamlit run streamlit_app/app.py
-```
 
-Los servicios estarán disponibles en los puertos mapeados en tu máquina host:
-- API: http://localhost:8000 (iniciada automáticamente)
-- Streamlit (desarrollo): http://localhost:8502
 
 ---
 
 ## Servicios Independientes
 
-### Iniciar solo el servicio de PostgreSQL
+### Iniciar solo el servicio de PostgreSQL/PostGIS
 
 Cuando no necesitas el stack completo y solo quieres trabajar con la base de datos:
 
@@ -317,7 +335,7 @@ docker-compose -p oic-postgis up oic-model-postgis
 ```
 
 Este comando:
-- Inicia únicamente el servicio de base de datos PostgreSQL
+- Inicia únicamente el servicio de base de datos PostgreSQL con extensión PostGIS
 - Mantiene el nombre de proyecto consistente con el resto del stack
 - Es útil cuando necesitas trabajar solo con la base de datos sin levantar otros servicios
 - Permite realizar pruebas de conexión, modificaciones de esquema o consultas directas
@@ -327,7 +345,6 @@ Una vez inicializado el servicio de PostgreSQL, puedes conectarte a él usando:
 ```sh
 docker exec -it oic-model-postgis psql -U postgres -d postgres
 ```
-
 
 Para verificar que la base de datos está funcionando correctamente, puedes listar las tablas disponibles 
 con:
@@ -348,11 +365,24 @@ Si necesitas realizar cambios en la estructura de la base de datos, puedes acced
 
 ## Contribuciones
 
-Si eres miembro del equipo y deseas contribuir, por favor sigue estas directrices:
+Al ser un repositorio público, agradecemos las contribuciones de la comunidad. Si deseas contribuir a este proyecto, por favor sigue estos pasos:
 
-1. Crea una rama para tu feature o corrección de errores desde la rama principal (`git checkout -b feature/nueva-funcionalidad`).
-2. Realiza los cambios necesarios y haz commit de tus modificaciones (`git commit -m 'Añadir nueva funcionalidad'`).
-3. Haz push a tu rama (`git push origin feature/nueva-funcionalidad`).
-4. Abre un Pull Request (PR) en GitHub y describe los cambios realizados.
-5. Asegúrate de que tu código cumpla con las normas de estilo.
-6. Espera la revisión de tus compañeros de equipo y realiza los ajustes necesarios según sus comentarios.
+1. Haz un fork del repositorio a tu cuenta de GitHub.
+2. Crea una nueva rama para tu contribución (`git checkout -b feature/nueva-funcionalidad`).
+3. Realiza tus cambios y mejoras en la rama.
+4. Asegúrate de que tu código cumpla con las normas de estilo del proyecto (usa Black para formateo).
+5. Confirma tus cambios (`git commit -m 'Añadir nueva funcionalidad'`).
+6. Empuja los cambios a tu fork (`git push origin feature/nueva-funcionalidad`).
+7. Abre un Pull Request (PR) desde tu fork al repositorio original.
+8. En la descripción del PR, explica claramente los cambios realizados y su propósito.
+9. Espera la revisión y colabora con los mantenedores para abordar cualquier comentario o sugerencia.
+
+Todas las contribuciones, grandes o pequeñas, son bienvenidas - desde correcciones de errores y mejoras en la documentación hasta nuevas funcionalidades.
+
+## Licencia
+
+Este proyecto se distribuye bajo los términos de la licencia MIT. Consulta el archivo LICENSE para más detalles.
+
+---
+
+**Última actualización:** 26 de abril de 2025

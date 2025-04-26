@@ -1,31 +1,40 @@
 {
-  "name": "OIC Development Environment",
-  "remoteUser": "root",
-  "dockerComposeFile": ["../docker-compose.yml"],
+  "name": "OIC Model Project - Full Stack",
+  "dockerComposeFile": "../docker-compose.yml",
   "service": "oic-model-api",
-  "runServices": ["oic-model-api"],
   "workspaceFolder": "/mini-proyecto-oic",
   "shutdownAction": "stopCompose",
+  "remoteUser": "root",
+  "remoteEnv": {
+    "PYTHONPATH": "${containerWorkspaceFolder}"
+  },
   "customizations": {
-    "settings": {
-        "terminal.integrated.defaultProfile.linux": "bash",
-        "python.defaultInterpreterPath": "/opt/conda/envs/oic-model-server/bin/python",
+    "vscode": {
+      "settings": {
         "python.linting.enabled": true,
         "python.linting.pylintEnabled": true,
+        "python.formatting.provider": "black",
+        "python.formatting.blackPath": "/opt/conda/envs/oic-model-server/bin/black",
         "editor.formatOnSave": true,
-        "terminal.integrated.profiles.linux": {
-          "bash": {"path": "/bin/bash"}
-        }       
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.python"
+        }
       },
-    "vscode": {
       "extensions": [
         "ms-python.python",
-        "ms-azuretools.vscode-docker",
-        "ms-toolsai.jupyter",
-        "github.copilot",
-        "eamodio.gitlens",
-        "ms-python.vscode-pylance"
-      ]      
+        "ms-python.vscode-pylance",
+        "GitHub.copilot",
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-pg",
+        "mhutchie.git-graph"
+      ]
     }
-  }
+  },
+  "forwardPorts": [
+    5432,
+    5433,
+    8000,
+    8501,
+    5678
+  ]  
 }
