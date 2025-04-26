@@ -1,0 +1,31 @@
+{
+  "name": "OIC Development Environment",
+  "remoteUser": "root",
+  "dockerComposeFile": ["../docker-compose.yml"],
+  "service": "oic-model-api",
+  "runServices": ["oic-model-api"],
+  "workspaceFolder": "/mini-proyecto-oic",
+  "shutdownAction": "stopCompose",
+  "customizations": {
+    "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "python.defaultInterpreterPath": "/opt/conda/envs/oic-model-server/bin/python",
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": true,
+        "editor.formatOnSave": true,
+        "terminal.integrated.profiles.linux": {
+          "bash": {"path": "/bin/bash"}
+        }       
+      },
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-azuretools.vscode-docker",
+        "ms-toolsai.jupyter",
+        "github.copilot",
+        "eamodio.gitlens",
+        "ms-python.vscode-pylance"
+      ]      
+    }
+  }
+}

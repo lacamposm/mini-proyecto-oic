@@ -1,6 +1,6 @@
-# 🧠 OIC Model Service — Sistema de Predicción en Producción
+# 🧠 OIC Model Service — Sistema de Predicción de precios de inmuebles
 
-Este repositorio contiene un sistema completo de predicción basado en regresión lineal, que expone una **API RESTful** con [FastAPI](https://fastapi.tiangolo.com/), una **interfaz web** en [Streamlit](https://streamlit.io/) y una **base de datos PostgreSQL**, todo completamente **dockerizado y preparado para producción**.
+Este repositorio contiene un sistema completo de predicción basado en regresión lineal, que expone una **API RESTful** con [FastAPI](https://fastapi.tiangolo.com/), una **interfaz web** en [Streamlit](https://streamlit.io/) y una **base de datos PostgreSQL**, todo completamente **dockerizado y preparado para desarrollo**.
 
 ---
 
@@ -8,6 +8,8 @@ Este repositorio contiene un sistema completo de predicción basado en regresió
 
 ```plaintext
 mini-proyecto-oic/
+├── .devcontainer/
+│   └── devcontainer.json
 ├── artifacts/
 │   └── input_schema_predict_v0.1.0.json
 │   └── kc_house_data.csv
@@ -102,10 +104,10 @@ Para acceder a un shell interactivo dentro del contenedor:
 docker run -it --rm oic-model-service /bin/bash
 ```
 
-Este comando te permite explorar el contenedor y verificar la instalación de dependencias:
+Este comando te permite explorar el contenedor y verificar los entornos conda instalados:
 
 ```sh
-conda list
+conda env list
 ```
 
 #### Opción B: Desarrollo con Volúmenes Montados
@@ -124,43 +126,18 @@ Para desarrollar mientras los cambios se reflejan en tiempo real:
     docker run -it --rm -v "${PWD}:/$(Split-Path -Leaf ${PWD})" -w "/$(Split-Path -Leaf ${PWD})" oic-model-service /bin/bash
     ```
 
-
 Este comando:
 - Monta el directorio actual como un volumen en el contenedor
 - Establece el directorio de trabajo al nombre de la carpeta actual
 - Abre un shell interactivo
-
-#### Opción C: Servicio VS-codeserver.
-
-Para ejecutar codeserver como IDE en el puerto 8000:
-
-- Linux:
-
-    ```sh
-    docker run -it --rm -p 8080:8080 -v "$(pwd)":/$(basename "$(pwd)") -w /$(basename "$(pwd)") oic-model-service
-    ```
-
-- Windows:
-
-    ```powershell
-    docker run -it --rm -p 8000:8000 -v "${PWD}:/$(Split-Path -Leaf ${PWD})" -w "/$(Split-Path -Leaf ${PWD})" oic-model-service
-    ```
-
-Este comando:
-- Expone el puerto 8080 para VS-codeserver. 
-- Monta el directorio actual como volumen
-- Permite acceder a los servicios desde el navegador local
-
-Una vez que el contenedor esté en ejecución, podrás acceder al IDE en:
-
-- **VS Code-Server:** [http://localhost:8080/?folder=/mini-proyecto-oic](http://localhost:8080/?folder=/mini-proyecto-oic)
-
 
 Para salir de cualquier contenedor interactivo, usa:
 
 ```sh
 exit
 ```
+
+**Nota:** Para un entorno de desarrollo completo, recomendamos usar VS Code con Dev Containers como se describe en la sección "Desarrollo con Visual Studio Code y Dev Containers" más adelante en este documento.
 
 ## Paso 3: Construcción y Ejecución de Servicios con docker-compose
 
@@ -263,15 +240,6 @@ Una vez iniciados los servicios, verifica que estén accesibles:
 
    La interfaz de usuario te permitirá ingresar valores y recibir predicciones en tiempo real.
 
-- **code-server (IDE en Navegador):** 
-
-  [http://localhost:8080/?folder=/mini-proyecto-oic](http://localhost:8080/?folder=/mini-proyecto-oic)
-
-  Te permite acceder a un IDE en el navegador para construir o editar tu proyecto en tiempo real.
-
-- **PostgreSQL (Base de Datos):**  
-  La base de datos corre en `localhost:5433`. Puedes conectarte usando un cliente como `pgAdmin` o `psql`.
-
 ### 4. Administración de Contenedores
 
 Si necesitas ver los logs de los servicios en tiempo real, ejecuta:
@@ -294,26 +262,55 @@ docker-compose down -v
 
 ---
 
-## Servicios Independientes
+## Desarrollo con Visual Studio Code y Dev Containers
 
+Este proyecto incluye configuración para desarrollo usando VS Code Dev Containers, lo que te permite trabajar dentro de un entorno Docker completamente configurado.
 
-### 1. Iniciar un servicio dev
+### 1. Requisitos previos
 
-```sh
-docker-compose -p oic-dev up oic-model-postgis oic-model-api oic-codeserver
+- [Visual Studio Code](https://code.visualstudio.com/)
+- Extensión [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) instalada
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows/Mac) o Docker Engine (Linux)
+
+### 2. Abrir en Dev Container
+
+1. Abre VS Code
+2. Presiona `F1` para abrir la paleta de comandos
+3. Escribe y selecciona `Dev Containers: Open Folder in Container...`
+4. Selecciona la carpeta de este proyecto
+
+VS Code construirá y configurará automáticamente el contenedor según las especificaciones en `.devcontainer/devcontainer.json`, y luego abrirá la ventana conectada al contenedor.
+
+**¡IMPORTANTE!** Al abrir el proyecto en un Dev Container, **la API se inicia automáticamente** por la configuración en `.devcontainer/devcontainer.json` que especifica `"runServices": ["oic-model-api"]`. No necesitas iniciarla manualmente, ya estará disponible en http://localhost:8000.
+
+### 3. Beneficios del Dev Container
+
+- Entorno de desarrollo consistente en cualquier máquina
+- Todas las dependencias preinstaladas
+- API levantada automáticamente y lista para usar
+- Acceso directo a la base de datos y servicios definidos en `docker-compose.yml`
+- Extensiones de VS Code preconfiguradas
+
+### 4. Ejecutar Streamlit desde el Dev Container
+
+Una vez dentro del contenedor de desarrollo, la API ya está en funcionamiento. Para iniciar la interfaz Streamlit:
+
+```bash
+# Para iniciar Streamlit (se ejecutará automáticamente en el puerto 8502)
+streamlit run streamlit_app/app.py
 ```
 
-Este comando:
+Los servicios estarán disponibles en los puertos mapeados en tu máquina host:
+- API: http://localhost:8000 (iniciada automáticamente)
+- Streamlit (desarrollo): http://localhost:8502
 
-- Inicia un servicio para desarrollar en el proyecto.
-- Mantiene el nombre de proyecto consistente con el resto del stack.
-- Es útil cuando necesitas desarrollar sobre el proyecto completo (API-MODEL-UI).
+---
 
-Una vez que el contenedor esté en ejecución, podrás acceder al IDE en:
+## Servicios Independientes
 
-- **VS Code-Server:** [http://localhost:8080/?folder=/mini-proyecto-oic](http://localhost:8080/?folder=/mini-proyecto-oic)
+### Iniciar solo el servicio de PostgreSQL
 
-### 2. Iniciar solo el servicio de PostgreSQL
+Cuando no necesitas el stack completo y solo quieres trabajar con la base de datos:
 
 ```sh
 docker-compose -p oic-postgis up oic-model-postgis
@@ -328,7 +325,7 @@ Este comando:
 Una vez inicializado el servicio de PostgreSQL, puedes conectarte a él usando:
 
 ```sh
-docker exec -it oic-postgis psql -U postgres -d postgres
+docker exec -it oic-model-postgis psql -U postgres -d postgres
 ```
 
 
@@ -347,9 +344,7 @@ SELECT * FROM predictions;
 
 Si necesitas realizar cambios en la estructura de la base de datos, puedes acceder a la terminal interactiva de `PostgreSQL` dentro del contenedor.
 
-
-
-
+---
 
 ## Contribuciones
 
