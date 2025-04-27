@@ -10,7 +10,9 @@ Este repositorio contiene un sistema completo de predicción basado en regresió
 mini-proyecto-oic/
 ├── .devcontainer/
 │   ├── Dockerfile.dev
+│   ├── Dockerfile.ui
 │   ├── docker-compose-dev.yml
+│   ├── environment.ui.yml
 │   └── devcontainer.json
 ├── artifacts/
 │   ├── input_schema_predict_v0.1.0.json
@@ -306,12 +308,15 @@ El proyecto ofrece dos opciones para trabajar con Dev Containers:
 
 #### Entorno de Desarrollo Optimizado (Recomendado)
 
-El entorno de desarrollo utiliza un Dockerfile y docker-compose dedicados ubicados en el directorio `.devcontainer/`:
+El entorno de desarrollo utiliza Dockerfiles y docker-compose dedicados ubicados en el directorio `.devcontainer/`:
 
-- `Dockerfile.dev`: Configurado específicamente para desarrollo
+- `Dockerfile.dev`: Configurado específicamente para el desarrollo de la API
+- `Dockerfile.ui`: Configurado específicamente para el desarrollo de la interfaz de usuario Streamlit
 - `docker-compose-dev.yml`: Configuración separada de Docker Compose para desarrollo
+- `environment.ui.yml`: Archivos de entorno específicos para la UI 
 - Usuario no-root (`dev-user`) para mayor seguridad
 - Volúmenes configurados para sincronizar todos los cambios entre host y contenedor
+- Depuración integrada para FastAPI y Streamlit
 
 Esta opción está configurada por defecto en el archivo `devcontainer.json`.
 
@@ -322,10 +327,11 @@ Esta opción está configurada por defecto en el archivo `devcontainer.json`.
 - Entorno de desarrollo consistente en cualquier máquina
 - Todas las dependencias preinstaladas (Python, Conda, PostgreSQL client, etc.)
 - Acceso directo a la base de datos y servicios definidos en `docker-compose.yml`
-- Extensiones de VS Code preconfiguradas (Python, Pylance, Git, etc.)
+- Extensiones de VS Code preconfiguradas (Python, Pylance, Git, Debugpy, etc.)
 - Formateo automático con Black configurado
 - Linting con Pylint habilitado
 - Sincronización bidireccional de archivos entre el host y el contenedor
+- Configuración separada para servicios de API y UI
 
 ### 4. Puertos Disponibles
 
@@ -334,7 +340,7 @@ Los siguientes puertos están configurados para reenvío automático:
 - 5433: PostgreSQL mapeado al host
 - 8000: API FastAPI
 - 8501: Interfaz Streamlit
-- 5678: Puerto para depuración remota (Python)
+- 5678: Puerto para depuración remota.
 
 ---
 
@@ -399,4 +405,4 @@ Este proyecto se distribuye bajo los términos de la licencia MIT. Consulta el a
 
 ---
 
-**Última actualización:** 26 de abril de 2025
+**Última actualización:** 27 de abril de 2025

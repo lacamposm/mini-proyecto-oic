@@ -10,53 +10,19 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     volumes:
-      - oic-db-model-service:/var/lib/postgresql/data
+      - oic-db-model-service-dev:/var/lib/postgresql/data
     networks:
-      - oic_service_network
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - oic_service_network_dev
 
   oic-model-api:
     build:
       context: ..
       dockerfile: .devcontainer/Dockerfile.dev
-    image: oic-model-service-dev
+    image: oic-model-api-dev
     container_name: oic-model-api-dev
     depends_on:
       oic-model-postgis:
-        condition: service_healthy
-    env_file:
-      - ../.env
-    environment:
-      - PYTHONUNBUFFERED=1
-      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@oic-model-postgis:5432/postgres}
-    volumes:
-      - ..:/mini-proyecto-oic
-    ports:
-      - "8000:8000"
-      - "8001:8001"
-      - "8502:8502"
-      - "5678:5678"
-    networks:
-      - oic_service_network
-    command: >
-      sh -c "conda run -n oic-model-server uvicorn oic_model_server.main:app --host 0.0.0.0 --port 8000 --reload"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 20s
-      retries: 5
-      start_period: 40s
-
-  oic-ui-service:
-    image: oic-model-service-dev
-    container_name: oic-ui-service-dev
-    depends_on:
-      oic-model-api:
-        condition: service_healthy
+        condition: service_started
     env_file:
       - ../.env
     environment:
@@ -64,18 +30,42 @@ services:
       - STREAMLIT_SERVER_RUN_ON_SAVE=true
       - STREAMLIT_SERVER_ADDRESS=0.0.0.0
       - STREAMLIT_BROWSER_SERVER_ADDRESS=0.0.0.0
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@oic-model-postgis:5432/postgres}
+    volumes:
+      - ..:/mini-proyecto-oic
+    ports:
+      - "8000:8000"
+      - "5678:5678"      
+    networks:
+      - oic_service_network_dev
+
+  oic-ui-service:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile.ui
+    image: oic-model-ui-dev
+    container_name: oic-model-ui-dev
+    depends_on:
+      oic-model-api:
+        condition: service_started
+    env_file:
+      - ../.env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - API_URL=http://oic-model-api:8000
+      - STREAMLIT_SERVER_RUN_ON_SAVE=true
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+      - STREAMLIT_BROWSER_SERVER_ADDRESS=0.0.0.0
     ports:
       - "8501:8501"
     volumes:
-      - ..:/mini-proyecto-oic
+      - ../streamlit_app:/mini-proyecto-oic/streamlit_app
     networks:
-      - oic_service_network
-    command: >
-      sh -c "conda run --live-stream -n oic-model-server streamlit run streamlit_app/app.py"
-
+      - oic_service_network_dev
+    
 volumes:
-  oic-db-model-service:
+  oic-db-model-service-dev:
 
 networks:
-  oic_service_network:
+  oic_service_network_dev:
     driver: bridge
