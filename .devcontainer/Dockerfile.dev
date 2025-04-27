@@ -3,9 +3,9 @@ FROM lacamposm/docker-helpers:python-conda-base-latest
 
 WORKDIR /mini-proyecto-oic
 
-# First copy and setup the environment from the root directory
-COPY environment.yml /tmp/environment.yml
-RUN conda env create -f /tmp/environment.yml -n oic-model-server \
+# First copy and setup the environment from the development environment file
+COPY .devcontainer/environment.dev.yml /tmp/environment.dev.yml
+RUN conda env create -f /tmp/environment.dev.yml -n oic-model-server \
     && conda clean --all --yes
 
 RUN printf "source /opt/conda/etc/profile.d/conda.sh\nconda activate oic-model-server\n" \
@@ -32,5 +32,5 @@ RUN groupadd --gid $USER_GID dev-user \
 
 USER dev-user
 
-EXPOSE 8000 8501
+EXPOSE 8000 8501 5678
 CMD ["tail", "-f", "/dev/null"]

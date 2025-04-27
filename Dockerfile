@@ -1,4 +1,4 @@
-# Imagen base con Conda, VSCode, y utilidades
+# Visita https://hub.docker.com/r/lacamposm/docker-helpers para más información sobre esta imagen base
 FROM lacamposm/docker-helpers:python-conda-base-latest
 
 # Crear carpeta del proyecto
@@ -11,7 +11,9 @@ RUN apt-get update && \
 
 # Copiar environment.yml y crear entorno conda
 COPY environment.yml /tmp/environment.yml
-RUN conda env create -f /tmp/environment.yml && rm /tmp/environment.yml
+RUN conda env create -f /tmp/environment.yml && \
+    conda clean --all --yes && \
+    rm /tmp/environment.yml
 
 # Copiar código del backend (API), frontend (UI), y artifacts
 COPY ./oic_model_server /mini-proyecto-oic/oic_model_server

@@ -4,6 +4,12 @@
   "service": "oic-model-api",
   "workspaceFolder": "/mini-proyecto-oic",
   "shutdownAction": "stopCompose",
+  "remoteUser": "dev-user",
+  "runServices": [
+    "oic-model-api",
+    "oic-model-postgis",
+    "oic-ui-service"
+  ],
   "remoteEnv": {
     "PYTHONPATH": "${containerWorkspaceFolder}"
   },
@@ -46,6 +52,7 @@
     5433,
     8000,
     8501,
+    8502,
     5678
   ],
   "postCreateCommand": "echo 'Entorno de desarrollo configurado correctamente. Asegúrate de configurar el archivo .env si es necesario.'"

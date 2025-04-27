@@ -23,20 +23,23 @@ services:
     build:
       context: ..
       dockerfile: .devcontainer/Dockerfile.dev
-    image: oic-model-service
-    container_name: oic-model-api
+    image: oic-model-service-dev
+    container_name: oic-model-api-dev
     depends_on:
       oic-model-postgis:
         condition: service_healthy
     env_file:
       - ../.env
     environment:
-      - PYTHONUNBUFFERED="1"
+      - PYTHONUNBUFFERED=1
       - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@oic-model-postgis:5432/postgres}
     volumes:
       - ..:/mini-proyecto-oic
     ports:
       - "8000:8000"
+      - "8001:8001"
+      - "8502:8502"
+      - "5678:5678"
     networks:
       - oic_service_network
     command: >
@@ -49,15 +52,15 @@ services:
       start_period: 40s
 
   oic-ui-service:
-    image: oic-model-service
-    container_name: oic-ui-service
+    image: oic-model-service-dev
+    container_name: oic-ui-service-dev
     depends_on:
       oic-model-api:
         condition: service_healthy
     env_file:
       - ../.env
     environment:
-      - PYTHONUNBUFFERED="1"
+      - PYTHONUNBUFFERED=1
       - STREAMLIT_SERVER_RUN_ON_SAVE=true
       - STREAMLIT_SERVER_ADDRESS=0.0.0.0
       - STREAMLIT_BROWSER_SERVER_ADDRESS=0.0.0.0
