@@ -9,11 +9,15 @@ Este repositorio contiene un sistema completo de predicción basado en regresió
 ```plaintext
 mini-proyecto-oic/
 ├── .devcontainer/
-│   ├── Dockerfile.dev
+│   ├── api/
+│   │   └── devcontainer.json
+│   ├── ui/
+│   │   └── devcontainer.json
+│   ├── Dockerfile.api
 │   ├── Dockerfile.ui
 │   ├── docker-compose-dev.yml
-│   ├── environment.ui.yml
-│   └── devcontainer.json
+│   ├── environment.api.yml
+│   └── environment.ui.yml
 ├── artifacts/
 │   ├── input_schema_predict_v0.1.0.json
 │   ├── kc_house_data.csv
@@ -298,29 +302,40 @@ Este proyecto incluye configuración para desarrollo usando VS Code Dev Containe
 ### 2. Abrir en Dev Container
 
 1. Abre VS Code
-2. Presiona `F1` para abrir la paleta de comandos
-3. Escribe y selecciona `Dev Containers: Open Folder in Container...`
-4. Selecciona la carpeta de este proyecto
+2. Abre la carpeta del proyecto
+3. Presiona `F1` para abrir la paleta de comandos
+4. Escribe y selecciona `Dev Containers: Rebuild and Reopen in Container...`
+5. VS Code te mostrará las opciones disponibles para elegir a cuál de los contenedores de desarrollo conectarte
 
-VS Code construirá y configurará automáticamente el contenedor según las especificaciones en `.devcontainer/devcontainer.json`, y luego abrirá la ventana conectada al contenedor.
+VS Code construirá y configurará automáticamente el contenedor según las especificaciones en los archivos `devcontainer.json`, y luego abrirá la ventana conectada al contenedor seleccionado.
 
-El proyecto ofrece dos opciones para trabajar con Dev Containers:
+**¡IMPORTANTE!** Al seleccionar la opción `Dev Containers: Rebuild and Reopen in Container...`, VS Code te preguntará a cuál de los dos entornos quieres conectarte:
+- Para desarrollo de backend, selecciona el contenedor basado en `.devcontainer/api/devcontainer.json`
+- Para desarrollo de frontend, selecciona el contenedor basado en `.devcontainer/ui/devcontainer.json`
 
-#### Entorno de Desarrollo Optimizado (Recomendado)
+Cada contenedor incluirá todas las herramientas necesarias para el desarrollo específico de esa parte del proyecto.
+
+#### Entorno de Desarrollo API
+
+El proyecto incluye una configuración específica para el desarrollo de la API en `.devcontainer/api/devcontainer.json`, que permite trabajar exclusivamente en el backend del servicio.
+
+#### Entorno de Desarrollo UI
+
+También existe una configuración específica para el desarrollo de la interfaz de usuario en `.devcontainer/ui/devcontainer.json`, que facilita el trabajo con Streamlit y los componentes de frontend.
+
+#### Características del Entorno de Desarrollo
 
 El entorno de desarrollo utiliza Dockerfiles y docker-compose dedicados ubicados en el directorio `.devcontainer/`:
-
-- `Dockerfile.dev`: Configurado específicamente para el desarrollo de la API
+- `Dockerfile.api`: Configurado específicamente para el desarrollo de la API
 - `Dockerfile.ui`: Configurado específicamente para el desarrollo de la interfaz de usuario Streamlit
 - `docker-compose-dev.yml`: Configuración separada de Docker Compose para desarrollo
+- `environment.api.yml`: Archivos de entorno específicos para la API
 - `environment.ui.yml`: Archivos de entorno específicos para la UI 
 - Usuario no-root (`dev-user`) para mayor seguridad
 - Volúmenes configurados para sincronizar todos los cambios entre host y contenedor
 - Depuración integrada para FastAPI y Streamlit
 
-Esta opción está configurada por defecto en el archivo `devcontainer.json`.
-
-**¡IMPORTANTE!** Al abrir el proyecto en un Dev Container, te conectarás al servicio `oic-model-api`. El contenedor ya incluirá todas las herramientas necesarias para el desarrollo.
+Esta opción está configurada por defecto en los archivos `devcontainer.json`.
 
 ### 3. Beneficios del Dev Container
 
@@ -340,7 +355,8 @@ Los siguientes puertos están configurados para reenvío automático:
 - 5433: PostgreSQL mapeado al host
 - 8000: API FastAPI
 - 8501: Interfaz Streamlit
-- 5678: Puerto para depuración remota.
+- 5678: Puerto para depuración remota API
+- 5679: Puerto para depuración remota UI
 
 ---
 
@@ -405,4 +421,4 @@ Este proyecto se distribuye bajo los términos de la licencia MIT. Consulta el a
 
 ---
 
-**Última actualización:** 27 de abril de 2025
+**Última actualización:** 28 de abril de 2025
