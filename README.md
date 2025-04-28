@@ -1,5 +1,7 @@
 # 🧠 OIC Model Service — Sistema de Predicción de Precios de Inmuebles
+# 🧠 OIC Model Service — Sistema de Predicción de Precios de Inmuebles
 
+Este repositorio contiene un sistema completo de predicción basado en regresión lineal, que expone una **API RESTful** con [FastAPI](https://fastapi.tiangolo.com/), una **interfaz web** en [Streamlit](https://streamlit.io/) y una **base de datos PostgreSQL/PostGIS**, todo completamente **dockerizado y preparado para desarrollo**.
 Este repositorio contiene un sistema completo de predicción basado en regresión lineal, que expone una **API RESTful** con [FastAPI](https://fastapi.tiangolo.com/), una **interfaz web** en [Streamlit](https://streamlit.io/) y una **base de datos PostgreSQL/PostGIS**, todo completamente **dockerizado y preparado para desarrollo**.
 
 ---
@@ -9,15 +11,24 @@ Este repositorio contiene un sistema completo de predicción basado en regresió
 ```plaintext
 mini-proyecto-oic/
 ├── .devcontainer/
-│   ├── Dockerfile.dev
+│   ├── api/
+│   │   └── devcontainer.json
+│   ├── ui/
+│   │   └── devcontainer.json
+│   ├── Dockerfile.api
+│   ├── Dockerfile.ui
 │   ├── docker-compose-dev.yml
-│   └── devcontainer.json
+│   ├── environment.api.yml
+│   └── environment.ui.yml
 ├── artifacts/
+│   ├── input_schema_predict_v0.1.0.json
+│   ├── kc_house_data.csv
 │   ├── input_schema_predict_v0.1.0.json
 │   ├── kc_house_data.csv
 │   └── modelo_lineal_v0.1.0.pkl
 ├── docs/
 │   ├── source/
+│   │   ├── conf.py
 │   │   ├── conf.py
 │   │   ├── index.rst
 │   │   ├── model.rst
@@ -27,10 +38,14 @@ mini-proyecto-oic/
 │   │   └── _static/
 │   │       ├── logo_OIC_blue.png
 │   │       └── logo_python.jpg
+│   │   └── _static/
+│   │       ├── logo_OIC_blue.png
+│   │       └── logo_python.jpg
 │   ├── make.bat
 │   └── Makefile
 ├── model/
 │   ├── regression_model.py
+│   ├── run_training.py
 │   ├── run_training.py
 │   └── utils.py
 ├── oic_model_server/
@@ -40,13 +55,21 @@ mini-proyecto-oic/
 │   │   │   ├── user.py
 │   │   │   └── __init__.py
 │   │   └── __init__.py
+│   │   ├── routes/
+│   │   │   ├── predict.py
+│   │   │   ├── user.py
+│   │   │   └── __init__.py
+│   │   └── __init__.py
 │   ├── core/
 │   │   ├── config.py
 │   │   ├── database.py
 │   │   └── __init__.py
+│   │   └── __init__.py
 │   ├── models/
 │   │   ├── predict.py
 │   │   ├── raw_data.py
+│   │   ├── user.py
+│   │   └── __init__.py
 │   │   ├── user.py
 │   │   └── __init__.py
 │   ├── services/
@@ -56,8 +79,18 @@ mini-proyecto-oic/
 │   │   └── __init__.py
 │   ├── main.py
 │   └── __init__.py
+│   │   ├── user_service.py
+│   │   └── __init__.py
+│   ├── main.py
+│   └── __init__.py
 ├── streamlit_app/
 │   ├── components/
+│   │   ├── history.py
+│   │   ├── prediction.py
+│   │   ├── user_management.py
+│   │   └── __init__.py
+│   ├── app.py
+│   └── __init__.py
 │   │   ├── history.py
 │   │   ├── prediction.py
 │   │   ├── user_management.py
@@ -95,6 +128,7 @@ Si la construcción fue exitosa, verás la imagen creada en tu lista de imágene
 
 ```sh
 docker images | grep oic-model-service
+docker images | grep oic-model-service
 ```
 
 ### 2. Opciones para Ejecutar los Contenedores
@@ -108,8 +142,10 @@ docker run -it --rm oic-model-service /bin/bash
 ```
 
 Este comando te permite explorar el contenedor y verificar los entornos conda instalados:
+Este comando te permite explorar el contenedor y verificar los entornos conda instalados:
 
 ```sh
+conda env list
 conda env list
 ```
 
@@ -117,6 +153,7 @@ conda env list
 
 Para desarrollar mientras los cambios se reflejan en tiempo real:
 
+- Linux/macOS:
 - Linux/macOS:
 
     ```sh
@@ -142,12 +179,28 @@ exit
 
 **Nota:** Para un entorno de desarrollo completo, recomendamos usar VS Code con Dev Containers como se describe en la sección "Desarrollo con Visual Studio Code y Dev Containers" más adelante en este documento.
 
+**Nota:** Para un entorno de desarrollo completo, recomendamos usar VS Code con Dev Containers como se describe en la sección "Desarrollo con Visual Studio Code y Dev Containers" más adelante en este documento.
+
 ## Paso 3: Construcción y Ejecución de Servicios con docker-compose
 
 Después de haber construido y probado la imagen Docker, podemos proceder a levantar los servicios completos utilizando `docker-compose`.
 
 ---
 
+### 1. Configuración de Variables de Entorno
+
+Antes de iniciar los servicios, crea un archivo `.env` en la raíz del proyecto siguiendo el template en `.env.example`:
+
+```sh
+# Copiar el archivo de ejemplo y configurar según necesidad
+cp .env.example .env
+```
+
+Edita el archivo `.env` para establecer las variables de entorno necesarias, como la URL de la base de datos:
+
+```
+DATABASE_URL=postgresql://postgres:postgres@oic-model-postgis:5432/postgres
+```
 ### 1. Configuración de Variables de Entorno
 
 Antes de iniciar los servicios, crea un archivo `.env` en la raíz del proyecto siguiendo el template en `.env.example`:
@@ -209,6 +262,7 @@ Este proceso:
   ```
 
 ### 3. Verificación de Servicios
+### 3. Verificación de Servicios
 
 Una vez iniciados los servicios, verifica que estén accesibles:
 
@@ -243,7 +297,14 @@ Una vez iniciados los servicios, verifica que estén accesibles:
   ```
   
   La API responderá con una predicción similar a:
+  
+  La API responderá con una predicción similar a:
 
+  ```json
+  {
+    "prediction": 250000
+  }
+  ```
   ```json
   {
     "prediction": 250000
@@ -254,7 +315,13 @@ Una vez iniciados los servicios, verifica que estén accesibles:
   [http://localhost:8501](http://localhost:8501)
 
   La interfaz de usuario te permitirá ingresar valores y recibir predicciones en tiempo real.
+  La interfaz de usuario te permitirá ingresar valores y recibir predicciones en tiempo real.
 
+- **Base de Datos PostgreSQL/PostGIS:**
+  - Puerto: 5433 (mapeado desde 5432 del contenedor)
+  - Usuario: postgres
+  - Contraseña: postgres
+  - Base de datos: postgres
 - **Base de Datos PostgreSQL/PostGIS:**
   - Puerto: 5433 (mapeado desde 5432 del contenedor)
   - Usuario: postgres
@@ -276,6 +343,7 @@ docker-compose down
 ```
 
 Para detener los servicios y eliminar volúmenes (¡cuidado! esto eliminará todos los datos almacenados):
+Para detener los servicios y eliminar volúmenes (¡cuidado! esto eliminará todos los datos almacenados):
 
 ```sh
 docker-compose down -v
@@ -296,36 +364,51 @@ Este proyecto incluye configuración para desarrollo usando VS Code Dev Containe
 ### 2. Abrir en Dev Container
 
 1. Abre VS Code
-2. Presiona `F1` para abrir la paleta de comandos
-3. Escribe y selecciona `Dev Containers: Open Folder in Container...`
-4. Selecciona la carpeta de este proyecto
+2. Abre la carpeta del proyecto
+3. Presiona `F1` para abrir la paleta de comandos
+4. Escribe y selecciona `Dev Containers: Rebuild and Reopen in Container...`
+5. VS Code te mostrará las opciones disponibles para elegir a cuál de los contenedores de desarrollo conectarte
 
-VS Code construirá y configurará automáticamente el contenedor según las especificaciones en `.devcontainer/devcontainer.json`, y luego abrirá la ventana conectada al contenedor.
+VS Code construirá y configurará automáticamente el contenedor según las especificaciones en los archivos `devcontainer.json`, y luego abrirá la ventana conectada al contenedor seleccionado.
 
-El proyecto ofrece dos opciones para trabajar con Dev Containers:
+**¡IMPORTANTE!** Al seleccionar la opción `Dev Containers: Rebuild and Reopen in Container...`, VS Code te preguntará a cuál de los dos entornos quieres conectarte:
+- Para desarrollo de backend, selecciona el contenedor basado en `.devcontainer/api/devcontainer.json`
+- Para desarrollo de frontend, selecciona el contenedor basado en `.devcontainer/ui/devcontainer.json`
 
-#### Entorno de Desarrollo Optimizado (Recomendado)
+Cada contenedor incluirá todas las herramientas necesarias para el desarrollo específico de esa parte del proyecto.
 
-El entorno de desarrollo utiliza un Dockerfile y docker-compose dedicados ubicados en el directorio `.devcontainer/`:
+#### Entorno de Desarrollo API
 
-- `Dockerfile.dev`: Configurado específicamente para desarrollo
+El proyecto incluye una configuración específica para el desarrollo de la API en `.devcontainer/api/devcontainer.json`, que permite trabajar exclusivamente en el backend del servicio.
+
+#### Entorno de Desarrollo UI
+
+También existe una configuración específica para el desarrollo de la interfaz de usuario en `.devcontainer/ui/devcontainer.json`, que facilita el trabajo con Streamlit y los componentes de frontend.
+
+#### Características del Entorno de Desarrollo
+
+El entorno de desarrollo utiliza Dockerfiles y docker-compose dedicados ubicados en el directorio `.devcontainer/`:
+- `Dockerfile.api`: Configurado específicamente para el desarrollo de la API
+- `Dockerfile.ui`: Configurado específicamente para el desarrollo de la interfaz de usuario Streamlit
 - `docker-compose-dev.yml`: Configuración separada de Docker Compose para desarrollo
+- `environment.api.yml`: Archivos de entorno específicos para la API
+- `environment.ui.yml`: Archivos de entorno específicos para la UI 
 - Usuario no-root (`dev-user`) para mayor seguridad
 - Volúmenes configurados para sincronizar todos los cambios entre host y contenedor
+- Depuración integrada para FastAPI y Streamlit
 
-Esta opción está configurada por defecto en el archivo `devcontainer.json`.
-
-**¡IMPORTANTE!** Al abrir el proyecto en un Dev Container, te conectarás al servicio `oic-model-api`. El contenedor ya incluirá todas las herramientas necesarias para el desarrollo.
+Esta opción está configurada por defecto en los archivos `devcontainer.json`.
 
 ### 3. Beneficios del Dev Container
 
 - Entorno de desarrollo consistente en cualquier máquina
 - Todas las dependencias preinstaladas (Python, Conda, PostgreSQL client, etc.)
 - Acceso directo a la base de datos y servicios definidos en `docker-compose.yml`
-- Extensiones de VS Code preconfiguradas (Python, Pylance, Git, etc.)
+- Extensiones de VS Code preconfiguradas (Python, Pylance, Git, Debugpy, etc.)
 - Formateo automático con Black configurado
 - Linting con Pylint habilitado
 - Sincronización bidireccional de archivos entre el host y el contenedor
+- Configuración separada para servicios de API y UI
 
 ### 4. Puertos Disponibles
 
@@ -334,12 +417,16 @@ Los siguientes puertos están configurados para reenvío automático:
 - 5433: PostgreSQL mapeado al host
 - 8000: API FastAPI
 - 8501: Interfaz Streamlit
-- 5678: Puerto para depuración remota (Python)
+- 5678: Puerto para depuración remota API
+- 5679: Puerto para depuración remota UI
 
 ---
 
 ## Servicios Independientes
 
+### Iniciar solo el servicio de PostgreSQL/PostGIS
+
+Cuando no necesitas el stack completo y solo quieres trabajar con la base de datos:
 ### Iniciar solo el servicio de PostgreSQL/PostGIS
 
 Cuando no necesitas el stack completo y solo quieres trabajar con la base de datos:
@@ -350,6 +437,7 @@ docker-compose -p oic-postgis up oic-model-postgis
 
 Este comando:
 - Inicia únicamente el servicio de base de datos PostgreSQL con extensión PostGIS
+- Inicia únicamente el servicio de base de datos PostgreSQL con extensión PostGIS
 - Mantiene el nombre de proyecto consistente con el resto del stack
 - Es útil cuando necesitas trabajar solo con la base de datos sin levantar otros servicios
 - Permite realizar pruebas de conexión, modificaciones de esquema o consultas directas
@@ -357,6 +445,7 @@ Este comando:
 Una vez inicializado el servicio de PostgreSQL, puedes conectarte a él usando:
 
 ```sh
+docker exec -it oic-model-postgis psql -U postgres -d postgres
 docker exec -it oic-model-postgis psql -U postgres -d postgres
 ```
 
@@ -376,9 +465,11 @@ SELECT * FROM predictions;
 Si necesitas realizar cambios en la estructura de la base de datos, puedes acceder a la terminal interactiva de `PostgreSQL` dentro del contenedor.
 
 ---
+---
 
 ## Contribuciones
 
+Al ser un repositorio público, agradecemos las contribuciones de la comunidad. Si deseas contribuir a este proyecto, por favor sigue estos pasos:
 Al ser un repositorio público, agradecemos las contribuciones de la comunidad. Si deseas contribuir a este proyecto, por favor sigue estos pasos:
 
 1. Haz un fork del repositorio a tu cuenta de GitHub.
@@ -399,4 +490,4 @@ Este proyecto se distribuye bajo los términos de la licencia MIT. Consulta el a
 
 ---
 
-**Última actualización:** 26 de abril de 2025
+**Última actualización:** 28 de abril de 2025
