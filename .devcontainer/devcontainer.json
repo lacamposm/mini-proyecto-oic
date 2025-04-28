@@ -1,0 +1,52 @@
+{
+  "name": "OIC Model Project - Desarrollo",
+  "dockerComposeFile": "docker-compose-dev.yml",
+  "service": "oic-model-api",
+  "workspaceFolder": "/mini-proyecto-oic",
+  "shutdownAction": "stopCompose",
+  "remoteEnv": {
+    "PYTHONPATH": "${containerWorkspaceFolder}"
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.profiles.linux": {
+          "bash-login": {
+            "path": "/bin/bash",
+            "args": [
+              "-l",
+              "-i"
+            ]
+          }
+        },
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "python.condaPath": "/opt/conda/bin/conda",
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": true,
+        "python.formatting.provider": "black",
+        "python.formatting.blackPath": "/opt/conda/envs/oic-model-server/bin/black",
+        "editor.formatOnSave": true,
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.python"
+        },
+        "jupyter.notebookFileRoot": "${containerWorkspaceFolder}"
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "GitHub.copilot",
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-pg",
+        "mhutchie.git-graph"
+      ]
+    }
+  },
+  "forwardPorts": [
+    5432,
+    5433,
+    8000,
+    8501,
+    5678
+  ],
+  "postCreateCommand": "echo 'Entorno de desarrollo configurado correctamente. Asegúrate de configurar el archivo .env si es necesario.'"
+}
