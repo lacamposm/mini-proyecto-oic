@@ -8,8 +8,6 @@ WORKDIR /mini-proyecto-oic
 RUN apt-get update && \
     apt-get install -y build-essential postgresql-client && \
     apt-get clean
-    apt-get install -y build-essential postgresql-client && \
-    apt-get clean
 
 # Copy environment.yml and create conda environment
 COPY environment.yml /tmp/environment.yml
