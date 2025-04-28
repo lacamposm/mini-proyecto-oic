@@ -1,22 +1,21 @@
 # Use the same base image as the main Dockerfile
+# https://hub.docker.com/r/lacamposm/docker-helpers to more information
 FROM lacamposm/docker-helpers:python-conda-base-latest
 
 WORKDIR /mini-proyecto-oic
 
-# First copy and setup the environment from the development environment file
+# First copy and setup the environment from the UI environment file with Python 3.10
 COPY .devcontainer/environment.ui.yml /tmp/environment.ui.yml
-RUN conda env create -f /tmp/environment.ui.yml -n oic-model-server \
+RUN conda env create -f /tmp/environment.ui.yml -n oic-model-ui \
     && conda clean --all --yes
 
-RUN printf "source /opt/conda/etc/profile.d/conda.sh\nconda activate oic-model-server\n" \
+RUN printf "source /opt/conda/etc/profile.d/conda.sh\nconda activate oic-model-ui\n" \
     > /etc/profile.d/conda-env.sh
 
-# Install system dependencies needed for PostgreSQL client and build tools
+# Install system dependencies needed for build tools
 RUN apt-get update && \
-    apt-get install -y build-essential postgresql-client && \
+    apt-get install -y build-essential && \
     apt-get clean
-
-COPY ./streamlit_app /mini-proyecto-oic/streamlit_app
 
 # Development-specific setup with a user that matches host UID/GID
 ARG USER_UID=1000
@@ -26,11 +25,11 @@ RUN groupadd --gid $USER_GID dev-user \
     && chown -R dev-user:dev-user /mini-proyecto-oic \
     && { \
     echo "source /opt/conda/etc/profile.d/conda.sh"; \
-    echo "conda activate oic-model-server"; \
+    echo "conda activate oic-model-ui"; \
     } >> /home/dev-user/.bashrc \
     && chown dev-user:dev-user /home/dev-user/.bashrc
 
 USER dev-user
 
-EXPOSE 8000 8501 5678
+EXPOSE 8501 5679
 CMD ["tail", "-f", "/dev/null"]

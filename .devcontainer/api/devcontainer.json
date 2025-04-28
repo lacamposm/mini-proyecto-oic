@@ -1,14 +1,13 @@
 {
-  "name": "OIC Model Project - Desarrollo",
-  "dockerComposeFile": "docker-compose-dev.yml",
+  "name": "OIC Model Project - API Development (Python 3.12)",
+  "dockerComposeFile": "../docker-compose-dev.yml",
   "service": "oic-model-api",
   "workspaceFolder": "/mini-proyecto-oic",
   "shutdownAction": "stopCompose",
   "remoteUser": "dev-user",
   "runServices": [
     "oic-model-api",
-    "oic-model-postgis",
-    "oic-ui-service"
+    "oic-model-postgis"
   ],
   "remoteEnv": {
     "PYTHONPATH": "${containerWorkspaceFolder}"
@@ -30,18 +29,20 @@
         "python.linting.enabled": true,
         "python.linting.pylintEnabled": true,
         "python.formatting.provider": "black",
-        "python.formatting.blackPath": "/opt/conda/envs/oic-model-server/bin/black",
+        "python.formatting.blackPath": "/opt/conda/envs/oic-model-api/bin/black",
         "editor.formatOnSave": true,
         "[python]": {
           "editor.defaultFormatter": "ms-python.python"
         },
-        "jupyter.notebookFileRoot": "${containerWorkspaceFolder}"
+        "jupyter.notebookFileRoot": "${containerWorkspaceFolder}",
+        "python.defaultInterpreterPath": "/opt/conda/envs/oic-model-api/bin/python"
       },
       "extensions": [
         "ms-python.python",
         "ms-python.vscode-pylance",
         "ms-python.debugpy",
         "GitHub.copilot",
+        "mtxr.sqltools-driver-pg",
         "mtxr.sqltools",
         "mtxr.sqltools-driver-pg",
         "mhutchie.git-graph"
@@ -52,8 +53,7 @@
     5432,
     5433,
     8000,
-    8501,
     5678
   ],
-  "postCreateCommand": "echo '\n\n🚀 ¡ENTORNO DE DESARROLLO OIC CONFIGURADO EXITOSAMENTE! 🚀\n\n📋 Servicios disponibles:\n   - API FastAPI: http://localhost:8000\n   - UI Streamlit: http://localhost:8501\n   - PostgreSQL: localhost:5432\n\n🔧 Para depurar:\n   - API: Selecciona \"FastAPI: Debug in devcontainer\" (Puerto de debug: 5678)\n   - UI: Selecciona \"Streamlit: Debug in devcontainer\" (Puerto de debug: 5679)\n\n⚠️ IMPORTANTE: Verifica que el archivo .env esté configurado correctamente\n   Si encuentras problemas de conexión entre servicios, asegúrate que los nombres\n   de host coincidan con los definidos en docker-compose-dev.yml\n\n'"
+  "postCreateCommand": "echo '\n\n🚀 ¡ENTORNO DE DESARROLLO API OIC CONFIGURADO EXITOSAMENTE! 🚀\n\n📋 Servicios disponibles:\n   - API FastAPI (Python 3.12): http://localhost:8000\n   - PostgreSQL: localhost:5432\n\n🔧 Para depurar API:\n   - Selecciona \"FastAPI: Debug in devcontainer\" (Puerto de debug: 5678)\n\n⚠️ IMPORTANTE: Verifica que el archivo .env esté configurado correctamente\n   Si encuentras problemas de conexión entre servicios, asegúrate que los nombres\n   de host coincidan con los definidos en docker-compose-dev.yml\n\n'"
 }

@@ -1,28 +1,28 @@
-# Visita https://hub.docker.com/r/lacamposm/docker-helpers para más información sobre esta imagen base
+# https://hub.docker.com/r/lacamposm/docker-helpers for more information
 FROM lacamposm/docker-helpers:python-conda-base-latest
 
-# Crear carpeta del proyecto
+# Create project directory
 WORKDIR /mini-proyecto-oic
 
-# Instalar dependencias del sistema necesarias (p. ej. para psycopg2 o compilar extensiones)
+# Install required system dependencies (e.g., for psycopg2 or to compile extensions)
 RUN apt-get update && \
     apt-get install -y build-essential postgresql-client && \
     apt-get clean
 
-# Copiar environment.yml y crear entorno conda
+# Copy environment.yml and create conda environment
 COPY environment.yml /tmp/environment.yml
 RUN conda env create -f /tmp/environment.yml && \
     conda clean --all --yes && \
     rm /tmp/environment.yml
 
-# Copiar código del backend (API), frontend (UI), y artifacts
+# Copy backend (API), frontend (UI), and artifacts
 COPY ./oic_model_server /mini-proyecto-oic/oic_model_server
 COPY ./streamlit_app /mini-proyecto-oic/streamlit_app
 COPY ./artifacts /mini-proyecto-oic/artifacts
 
-# Activación automática del entorno conda
+# Enable automatic activation of the conda environment
 RUN echo 'eval "$(conda shell.bash hook)"' >> ~/.bashrc && \
     echo 'conda activate oic-model-server' >> ~/.bashrc
 
-# Exponer puertos para API y Streamlit
+# Expose ports for API and Streamlit
 EXPOSE 8000 8501
